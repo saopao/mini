@@ -21,9 +21,9 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"navigationBarTitleText": "身体信号翻译器",
+		"navigationBarBackgroundColor": "#EBE8E0",
+		"backgroundColor": "#EBE8E0"
 	},
 	"tabBar": {
 		"color": "#9CA3AF",
