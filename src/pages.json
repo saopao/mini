@@ -26,22 +26,28 @@
 		"backgroundColor": "#F8F8F8"
 	},
 	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#007AFF",
+		"color": "#9CA3AF",
+		"selectedColor": "#4A7C59",
 		"borderStyle": "black",
 		"backgroundColor": "#F8F8F8",
 		"list": [
 			{
 				"pagePath": "pages/index/index",
-				"text": "首页"
+				"text": "首页",
+				"iconPath": "static/tabbar/house.png",
+				"selectedIconPath": "static/tabbar/house-active.png"
 			},
 			{
 				"pagePath": "pages/today/index",
-				"text": "今日"
+				"text": "今日",
+				"iconPath": "static/tabbar/calendar.png",
+				"selectedIconPath": "static/tabbar/calendar-active.png"
 			},
 			{
 				"pagePath": "pages/mine/index",
-				"text": "我的"
+				"text": "我的",
+				"iconPath": "static/tabbar/user.png",
+				"selectedIconPath": "static/tabbar/user-active.png"
 			}
 		]
 	}
