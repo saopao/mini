@@ -31,20 +31,21 @@ defineProps<{
 .scenario-compare {
   overflow: hidden;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: #fff;
+  box-shadow: var(--shadow-card);
 }
 
 .scenario-compare__row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 0.8fr;
   align-items: center;
-  gap: 8px;
-  min-height: 42px;
+  gap: 6px;
+  min-height: 38px;
   border-top: 1px solid var(--color-border);
-  padding: 0 12px;
+  padding: 0 10px;
   color: var(--color-text-primary);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .scenario-compare__head {

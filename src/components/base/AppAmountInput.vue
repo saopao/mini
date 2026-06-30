@@ -6,6 +6,8 @@
     :error="error"
     input-type="digit"
     unit="元"
+    :mode="mode"
+    :icon="icon"
     @update:model-value="handleValue"
   />
 </template>
@@ -19,11 +21,15 @@ withDefaults(
     modelValue?: string | number
     placeholder?: string
     error?: string
+    mode?: 'card' | 'row'
+    icon?: string
   }>(),
   {
     modelValue: '',
     placeholder: '请输入金额',
-    error: ''
+    error: '',
+    mode: 'card',
+    icon: ''
   }
 )
 

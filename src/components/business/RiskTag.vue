@@ -14,11 +14,11 @@ defineProps<{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 22px;
+  min-height: 20px;
   border-radius: 999px;
-  padding: 0 9px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .risk-tag--success {

@@ -65,8 +65,8 @@ function goNext() {
 .industry {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  gap: 12px;
+  padding-bottom: calc(74px + env(safe-area-inset-bottom));
 }
 
 .industry__intro {
@@ -82,7 +82,7 @@ function goNext() {
 .industry__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 9px;
 }
 
 .industry__notice {
@@ -91,8 +91,10 @@ function goNext() {
 
 .industry__footer {
   position: fixed;
-  right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom));
-  left: 16px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(247, 250, 248, 0), rgba(247, 250, 248, 0.96) 26%);
 }
 </style>

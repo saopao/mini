@@ -52,12 +52,12 @@
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "开店避坑助手",
-    "navigationBarBackgroundColor": "#F6F8F7",
-    "backgroundColor": "#F6F8F7"
+    "navigationBarBackgroundColor": "#F7FAF8",
+    "backgroundColor": "#F7FAF8"
   },
   "tabBar": {
-    "color": "#6B7280",
-    "selectedColor": "#0F9F5A",
+    "color": "#7A8780",
+    "selectedColor": "#079B55",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [

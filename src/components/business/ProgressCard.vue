@@ -32,9 +32,10 @@ const safePercent = computed(() => Math.max(0, Math.min(100, props.percent)))
 <style scoped lang="scss">
 .progress-card {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: #fff;
-  padding: 15px;
+  padding: 13px;
+  box-shadow: var(--shadow-card);
 }
 
 .progress-card__header {
@@ -56,9 +57,9 @@ const safePercent = computed(() => Math.max(0, Math.min(100, props.percent)))
 
 .progress-card__track {
   overflow: hidden;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
-  margin-top: 11px;
+  margin-top: 10px;
   background: #edf1ef;
 }
 

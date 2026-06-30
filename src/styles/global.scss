@@ -12,6 +12,14 @@ textarea {
   box-sizing: border-box;
 }
 
+page,
+body {
+  min-height: 100%;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+}
+
 button {
   margin: 0;
   padding: 0;
@@ -39,4 +47,10 @@ button::after {
 
 .money-negative {
   color: var(--color-danger);
+}
+
+.visual-screen {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
 }

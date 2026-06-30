@@ -48,14 +48,15 @@ const targetPosition = computed(() => {
 <style scoped lang="scss">
 .trend-chart {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: #fff;
-  padding: 14px;
+  padding: 12px;
+  box-shadow: var(--shadow-card);
 }
 
 .trend-chart__plot {
   position: relative;
-  height: 126px;
+  height: 112px;
   border-bottom: 1px solid var(--color-border);
 }
 

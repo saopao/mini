@@ -20,13 +20,13 @@ withDefaults(
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-bg-card);
-  padding: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  padding: 13px;
+  box-shadow: var(--shadow-card);
 }
 
 .app-card--emphasis {
-  border-color: rgba(15, 159, 90, 0.18);
-  background: linear-gradient(135deg, #0f9f5a, #087a43);
+  border-color: rgba(7, 155, 85, 0.18);
+  background: linear-gradient(135deg, #0aa35c, #05783f);
   color: #fff;
 }
 

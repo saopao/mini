@@ -213,7 +213,7 @@ function goCalculate() {
 .ledger {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .ledger__date-row {
@@ -233,16 +233,16 @@ function goCalculate() {
 .ledger__summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
+  gap: 7px;
+  margin-top: 10px;
 }
 
 .ledger__quick,
 .ledger__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 9px;
+  margin-top: 10px;
 }
 
 .ledger__label {
@@ -253,13 +253,13 @@ function goCalculate() {
 
 .ledger__remark {
   width: 100%;
-  min-height: 82px;
-  margin-top: 10px;
+  min-height: 74px;
+  margin-top: 9px;
   border-radius: var(--radius-md);
   background: #f8faf9;
-  padding: 12px;
+  padding: 11px;
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .ledger__counter {
@@ -273,6 +273,6 @@ function goCalculate() {
 .ledger__actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 </style>

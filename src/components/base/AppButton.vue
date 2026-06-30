@@ -36,11 +36,12 @@ const classes = computed(() => ({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  border-radius: 15px;
+  min-height: 42px;
+  border-radius: 999px;
   padding: 0 18px;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: none;
 }
 
 .app-button--block {
@@ -48,12 +49,13 @@ const classes = computed(() => ({
 }
 
 .app-button--primary {
-  background: linear-gradient(180deg, #11a963, #087a43);
+  background: linear-gradient(180deg, #0baa61, #087a43);
   color: #fff;
+  box-shadow: 0 8px 18px rgba(7, 132, 72, 0.22);
 }
 
 .app-button--secondary {
-  border: 1px solid rgba(15, 159, 90, 0.28);
+  border: 1px solid rgba(7, 155, 85, 0.24);
   background: #fff;
   color: var(--color-brand-dark);
 }
@@ -64,6 +66,7 @@ const classes = computed(() => ({
 }
 
 .app-button--danger {
+  border-radius: var(--radius-md);
   background: var(--color-danger-bg);
   color: var(--color-danger);
 }

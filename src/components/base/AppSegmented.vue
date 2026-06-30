@@ -26,9 +26,9 @@ defineEmits<{
 <style scoped lang="scss">
 .app-segmented {
   display: flex;
-  min-height: 40px;
+  min-height: 36px;
   border-radius: 999px;
-  background: #f0f2f1;
+  background: #edf3ef;
   padding: 3px;
 }
 
@@ -36,12 +36,13 @@ defineEmits<{
   flex: 1;
   border-radius: 999px;
   color: var(--color-text-secondary);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .app-segmented__item--active {
-  background: var(--color-brand-primary);
+  background: linear-gradient(180deg, #0aa55e, #087c43);
   color: #fff;
+  box-shadow: 0 5px 12px rgba(7, 132, 72, 0.16);
 }
 </style>

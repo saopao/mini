@@ -8,14 +8,14 @@
       </view>
 
       <view class="calculate__form">
-        <AppInput v-model="form.shopName" label="店铺名称（选填）" placeholder="例如：社区咖啡小店" />
-        <AppAmountInput v-model="form.initialInvestment" label="前期投入（一次性）" :error="errors.initialInvestment" />
-        <AppAmountInput v-model="form.monthlyFixedCost" label="每月固定支出" :error="errors.monthlyFixedCost" />
-        <AppInput v-model="form.businessDaysPerMonth" label="营业天数（每月）" input-type="number" unit="天" :error="errors.businessDaysPerMonth" />
-        <AppInput v-model="form.grossMarginRate" label="行业毛利率" input-type="digit" unit="%" :error="errors.grossMarginRate" />
-        <AppAmountInput v-model="form.avgOrderValue" label="客单价" :error="errors.avgOrderValue" />
-        <AppInput v-model="form.paybackMonths" label="预期回本周期" input-type="number" unit="个月" :error="errors.paybackMonths" />
-        <AppInput v-model="form.maxDailyOrders" label="最大日单量（选填）" input-type="number" unit="单" />
+        <AppInput v-model="form.shopName" mode="row" icon="店" label="店铺名称（选填）" placeholder="社区咖啡小店" />
+        <AppAmountInput v-model="form.initialInvestment" mode="row" icon="投" label="前期投入（一次性）" :error="errors.initialInvestment" />
+        <AppAmountInput v-model="form.monthlyFixedCost" mode="row" icon="支" label="每月固定支出" :error="errors.monthlyFixedCost" />
+        <AppInput v-model="form.businessDaysPerMonth" mode="row" icon="天" label="营业天数（每月）" input-type="number" unit="天" :error="errors.businessDaysPerMonth" />
+        <AppInput v-model="form.grossMarginRate" mode="row" icon="利" label="行业毛利率" input-type="digit" unit="%" :error="errors.grossMarginRate" />
+        <AppAmountInput v-model="form.avgOrderValue" mode="row" icon="客" label="客单价" :error="errors.avgOrderValue" />
+        <AppInput v-model="form.paybackMonths" mode="row" icon="回" label="预期回本周期" input-type="number" unit="个月" :error="errors.paybackMonths" />
+        <AppInput v-model="form.maxDailyOrders" mode="row" icon="单" label="最大日单量（选填）" input-type="number" unit="单" />
       </view>
 
       <AppCard>
@@ -169,8 +169,8 @@ function submit() {
 .calculate {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  gap: 12px;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
 .calculate__progress {
@@ -182,7 +182,7 @@ function submit() {
 }
 
 .calculate__progress-bar {
-  width: 72px;
+  width: 76px;
   height: 3px;
   border-radius: 999px;
   background: var(--color-brand-primary);
@@ -191,7 +191,21 @@ function submit() {
 .calculate__form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.calculate__form :deep(.app-input) {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.calculate__form :deep(.app-input:last-child) {
+  border-bottom: 0;
 }
 
 .calculate__preview-title {
@@ -206,11 +220,11 @@ function submit() {
 .calculate__footer {
   position: fixed;
   right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(14px + env(safe-area-inset-bottom));
   left: 16px;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 7px;
   text-align: center;
 }
 

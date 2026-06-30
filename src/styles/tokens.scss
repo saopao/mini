@@ -1,17 +1,20 @@
-$color-brand-primary: #0f9f5a;
-$color-brand-dark: #087a43;
+$color-brand-primary: #079b55;
+$color-brand-dark: #06733f;
 $color-brand-light: #eaf8f0;
-$color-bg-page: #f6f8f7;
+$color-bg-page: #f7faf8;
 $color-bg-card: #ffffff;
-$color-text-primary: #111827;
-$color-text-secondary: #4b5563;
-$color-text-muted: #9ca3af;
-$color-border: #e5e7eb;
+$color-text-primary: #17211c;
+$color-text-secondary: #5d6b63;
+$color-text-muted: #9aa7a0;
+$color-border: #e5eee9;
 $color-warning: #f59e0b;
 $color-warning-bg: #fff7e6;
 $color-danger: #ef4444;
 $color-danger-bg: #fef2f2;
 $color-info: #2563eb;
+$color-success-bg: #effaf3;
+$shadow-card: 0 8px 22px rgba(21, 48, 36, 0.07);
+$shadow-soft: 0 14px 34px rgba(21, 48, 36, 0.09);
 
 $space-1: 4px;
 $space-2: 8px;
@@ -20,16 +23,16 @@ $space-4: 16px;
 $space-5: 20px;
 $space-6: 24px;
 
-$radius-sm: 8px;
-$radius-md: 12px;
-$radius-lg: 16px;
-$radius-xl: 20px;
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 12px;
+$radius-xl: 16px;
 
-$font-page-title: 22px;
-$font-section-title: 17px;
-$font-metric-xl: 38px;
-$font-metric-l: 26px;
-$font-body: 15px;
+$font-page-title: 20px;
+$font-section-title: 16px;
+$font-metric-xl: 36px;
+$font-metric-l: 22px;
+$font-body: 14px;
 $font-caption: 12px;
 
 :root {
@@ -47,6 +50,9 @@ $font-caption: 12px;
   --color-danger: #{$color-danger};
   --color-danger-bg: #{$color-danger-bg};
   --color-info: #{$color-info};
+  --color-success-bg: #{$color-success-bg};
+  --shadow-card: #{$shadow-card};
+  --shadow-soft: #{$shadow-soft};
   --space-1: #{$space-1};
   --space-2: #{$space-2};
   --space-3: #{$space-3};

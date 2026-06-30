@@ -140,21 +140,33 @@ function clearData() {
 .profile {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .profile__model {
   border-color: rgba(15, 159, 90, 0.22);
+  background:
+    radial-gradient(circle at 12% 20%, rgba(7, 155, 85, 0.08), transparent 70px),
+    #fff;
 }
 
 .profile__model-row {
   display: flex;
-  gap: 14px;
-  margin-bottom: 16px;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 14px;
 }
 
 .profile__model-icon {
-  font-size: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff8ea, #eef8f1);
+  font-size: 42px;
+  box-shadow: inset 0 -6px 16px rgba(7, 115, 63, 0.08);
 }
 
 .profile__eyebrow,
@@ -168,7 +180,7 @@ function clearData() {
   display: block;
   margin: 5px 0 7px;
   color: var(--color-text-primary);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -177,10 +189,10 @@ function clearData() {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
 }
 

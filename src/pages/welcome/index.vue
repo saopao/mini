@@ -8,15 +8,7 @@
         <text class="welcome__desc">测回本、看压力、做推演，帮你少走弯路</text>
       </view>
 
-      <view class="welcome__visual">
-        <view class="welcome__shop">🏪</view>
-        <view class="welcome__chart">
-          <view class="welcome__bar welcome__bar--sm" />
-          <view class="welcome__bar welcome__bar--md" />
-          <view class="welcome__bar welcome__bar--lg" />
-        </view>
-        <view class="welcome__coin">¥</view>
-      </view>
+      <HeroShopVisual />
 
       <view class="welcome__actions">
         <AppButton block @click="startCalculate">开始测算</AppButton>
@@ -42,6 +34,7 @@ import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
+import HeroShopVisual from '../../components/business/HeroShopVisual.vue'
 import { trackEvent } from '../../services/analytics/events'
 import { useShopStore } from '../../stores/shop'
 
@@ -75,26 +68,26 @@ function directEnter() {
 .welcome {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 15px;
   min-height: calc(100vh - 78px);
 }
 
 .welcome__hero {
-  padding-top: 18px;
+  padding-top: 17px;
   text-align: center;
 }
 
 .welcome__title {
   display: block;
   color: var(--color-brand-dark);
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 900;
   letter-spacing: 0;
 }
 
 .welcome__subtitle {
   display: block;
-  margin-top: 10px;
+  margin-top: 9px;
   color: var(--color-text-primary);
   font-size: 16px;
   font-weight: 600;
@@ -102,81 +95,15 @@ function directEnter() {
 
 .welcome__desc {
   display: block;
-  margin-top: 10px;
+  margin-top: 9px;
   color: var(--color-text-secondary);
   font-size: 13px;
-}
-
-.welcome__visual {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 190px;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(15, 159, 90, 0.2), transparent 86px),
-    linear-gradient(180deg, rgba(234, 248, 240, 0.82), rgba(255, 255, 255, 0.42));
-}
-
-.welcome__shop {
-  font-size: 88px;
-}
-
-.welcome__chart,
-.welcome__coin {
-  position: absolute;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-}
-
-.welcome__chart {
-  left: 24px;
-  bottom: 28px;
-  display: flex;
-  align-items: flex-end;
-  gap: 5px;
-  width: 74px;
-  height: 66px;
-  padding: 12px;
-}
-
-.welcome__bar {
-  width: 12px;
-  border-radius: 999px;
-  background: var(--color-brand-primary);
-}
-
-.welcome__bar--sm {
-  height: 18px;
-}
-
-.welcome__bar--md {
-  height: 30px;
-}
-
-.welcome__bar--lg {
-  height: 42px;
-}
-
-.welcome__coin {
-  right: 26px;
-  bottom: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 54px;
-  height: 54px;
-  color: var(--color-brand-dark);
-  font-size: 28px;
-  font-weight: 800;
 }
 
 .welcome__actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .welcome__notice {
@@ -204,7 +131,7 @@ function directEnter() {
 .welcome__disclaimer-title {
   display: block;
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 

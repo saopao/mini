@@ -13,13 +13,13 @@ defineProps<{
 <style scoped lang="scss">
 .app-page {
   min-height: 100vh;
-  padding: 54px 16px 24px;
+  padding: 50px 16px 24px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(15, 159, 90, 0.08), transparent 260px),
+    radial-gradient(circle at 50% -20px, rgba(7, 155, 85, 0.08), transparent 238px),
     var(--color-bg-page);
 }
 
 .app-page--tab {
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
 </style>

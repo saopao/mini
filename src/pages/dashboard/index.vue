@@ -2,7 +2,11 @@
   <AppPage tab>
     <AppHeader title="今日看板" />
     <view v-if="model && dashboard" class="dashboard">
-      <AppCard :variant="dashboard.todayIncome >= dashboard.dailyRevenueTarget ? 'emphasis' : 'default'">
+      <AppCard
+        class="dashboard__hero"
+        :class="{ 'dashboard__hero--done': dashboard.todayIncome >= dashboard.dailyRevenueTarget }"
+        :variant="dashboard.todayIncome >= dashboard.dailyRevenueTarget ? 'emphasis' : 'default'"
+      >
         <view class="dashboard__status">
           <text class="dashboard__status-title">{{ statusTitle }}</text>
           <text class="dashboard__status-desc">{{ statusDesc }}</text>
@@ -139,22 +143,36 @@ function editRecord(id: string) {
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+}
+
+.dashboard__hero {
+  border-color: rgba(7, 155, 85, 0.18);
+  background:
+    radial-gradient(circle at 88% 24%, rgba(7, 155, 85, 0.12), transparent 70px),
+    #fff;
+}
+
+.dashboard__hero--done {
+  background:
+    radial-gradient(circle at 88% 24%, rgba(255, 255, 255, 0.18), transparent 70px),
+    linear-gradient(135deg, #0aa35c, #05783f);
+  color: #fff;
 }
 
 .dashboard__status {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .dashboard__status-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
 }
 
 .dashboard__status-desc {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -169,7 +187,7 @@ function editRecord(id: string) {
   align-items: center;
   justify-content: space-between;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -183,8 +201,8 @@ function editRecord(id: string) {
 .dashboard__records {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 7px;
+  margin-top: 10px;
 }
 
 .dashboard__record {
@@ -202,6 +220,6 @@ function editRecord(id: string) {
 .dashboard__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 9px;
 }
 </style>

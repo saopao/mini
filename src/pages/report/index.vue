@@ -144,7 +144,7 @@ function goEdit() {
 .report {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   padding-bottom: 24px;
 }
 
@@ -153,7 +153,7 @@ function goEdit() {
   align-items: center;
   justify-content: space-between;
   color: var(--color-text-primary);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -167,8 +167,8 @@ function goEdit() {
 .report__formula {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 7px;
+  margin-top: 10px;
 }
 
 .report__risk,
@@ -177,7 +177,7 @@ function goEdit() {
   align-items: flex-start;
   gap: 8px;
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -222,6 +222,6 @@ function goEdit() {
 .report__actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 </style>

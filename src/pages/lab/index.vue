@@ -15,11 +15,11 @@
       <AppCard>
         <text class="lab__section-title">参数调整</text>
         <view class="lab__controls">
-          <AppInput v-model="patch.avgOrderValue" label="客单价" input-type="digit" unit="元" />
-          <AppInput v-model="patch.dailyOrderTarget" label="日单量" input-type="number" unit="单" />
-          <AppInput v-model="patch.grossMarginRate" label="毛利率" input-type="digit" unit="%" />
-          <AppAmountInput v-model="patch.monthlyFixedCost" label="固定支出（元/月）" />
-          <AppInput v-model="patch.paybackMonths" label="回本周期" input-type="number" unit="个月" />
+          <AppInput v-model="patch.avgOrderValue" mode="row" icon="客" label="客单价" input-type="digit" unit="元" />
+          <AppInput v-model="patch.dailyOrderTarget" mode="row" icon="单" label="日单量" input-type="number" unit="单" />
+          <AppInput v-model="patch.grossMarginRate" mode="row" icon="利" label="毛利率" input-type="digit" unit="%" />
+          <AppAmountInput v-model="patch.monthlyFixedCost" mode="row" icon="支" label="固定支出（元/月）" />
+          <AppInput v-model="patch.paybackMonths" mode="row" icon="回" label="回本周期" input-type="number" unit="个月" />
         </view>
       </AppCard>
 
@@ -189,7 +189,7 @@ function goCalculate() {
 .lab {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .lab__baseline {
@@ -211,8 +211,21 @@ function goCalculate() {
 .lab__controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   margin-top: 12px;
+  background: #fff;
+}
+
+.lab__controls :deep(.app-input) {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.lab__controls :deep(.app-input:last-child) {
+  border-bottom: 0;
 }
 
 .lab__actions {
