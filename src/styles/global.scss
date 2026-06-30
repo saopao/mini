@@ -1,0 +1,42 @@
+@use "./tokens.scss";
+
+* {
+  box-sizing: border-box;
+}
+
+view,
+text,
+button,
+input,
+textarea {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  line-height: 1;
+}
+
+button::after {
+  border: 0;
+}
+
+.page-safe-bottom {
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.money-positive {
+  color: var(--color-brand-primary);
+}
+
+.money-negative {
+  color: var(--color-danger);
+}
