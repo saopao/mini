@@ -25,18 +25,18 @@ withDefaults(
 }
 
 .app-card--emphasis {
-  border-color: rgba(7, 155, 85, 0.18);
-  background: linear-gradient(135deg, #0aa35c, #05783f);
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary);
   color: #fff;
 }
 
 .app-card--warning {
-  border-color: rgba(245, 158, 11, 0.22);
+  border-color: var(--color-warning);
   background: var(--color-warning-bg);
 }
 
 .app-card--danger {
-  border-color: rgba(239, 68, 68, 0.22);
+  border-color: var(--color-danger);
   background: var(--color-danger-bg);
 }
 </style>

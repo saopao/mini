@@ -44,6 +44,22 @@
         <text class="ledger__counter">{{ form.remark.length }}/50</text>
       </AppCard>
 
+      <AppCard v-if="historyRecords.length">
+        <view class="ledger__history-head">
+          <text class="ledger__label">历史记录</text>
+          <text>点击可编辑或删除</text>
+        </view>
+        <view class="ledger__history-list">
+          <button v-for="record in historyRecords" :key="record.id" class="ledger__history-item" @click="editRecord(record.id)">
+            <view>
+              <text>{{ record.type === 'income' ? '收入' : '支出' }} · {{ record.category }}</text>
+              <text>{{ record.date }}</text>
+            </view>
+            <text>{{ formatMoney(record.amount) }}</text>
+          </button>
+        </view>
+      </AppCard>
+
       <AppToast :message="feedback" />
 
       <view class="ledger__actions">
@@ -103,6 +119,12 @@ const model = computed(() => shopStore.currentModel)
 const editing = computed(() => ledgerStore.editingRecord)
 const categories = computed(() => (form.type === 'income' ? incomeCategories : expenseCategories))
 const todaySnapshot = computed(() => reportStore.buildDashboardFor(form.date))
+const historyRecords = computed(() =>
+  ledgerStore.records
+    .slice()
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 8)
+)
 
 watch(
   () => form.type,
@@ -202,6 +224,17 @@ function resetForm() {
   resetFieldsOnly()
 }
 
+function editRecord(id: string) {
+  ledgerStore.setEditingRecord(id)
+  const record = ledgerStore.editingRecord
+  if (!record) return
+  form.date = record.date
+  form.type = record.type
+  form.amount = String(record.amount)
+  form.category = record.category
+  form.remark = record.remark ?? ''
+}
+
 function goCalculate() {
   uni.navigateTo({ url: '/pages/industry/index' })
 }
@@ -266,6 +299,52 @@ function goCalculate() {
   color: var(--color-text-muted);
   font-size: 11px;
   text-align: right;
+}
+
+.ledger__history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ledger__history-head text:last-child {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.ledger__history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ledger__history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 46px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+  padding: 0 12px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  text-align: left;
+}
+
+.ledger__history-item view {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ledger__history-item view text:last-child {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.ledger__history-item > text {
+  font-weight: 700;
 }
 
 .ledger__actions {

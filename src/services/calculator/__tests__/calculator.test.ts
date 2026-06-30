@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { calculatePaybackProgress, calculateTargets, calculateTodayProfit } from '../formulas'
 import { buildDashboardSnapshot, buildOperatingReport } from '../reportBuilder'
-import { simulateScenario } from '../simulate'
+import { simulateScenario, validateSimulationPatch } from '../simulate'
 import type { LedgerRecord, ShopModel } from '../types'
 
 const model: ShopModel = {
@@ -80,6 +80,18 @@ describe('simulation', () => {
     expect(model.avgOrderValue).toBe(25)
     expect(result.patchedModel.avgOrderValue).toBe(30)
     expect(result.after.dailyOrderTarget).toBeLessThan(result.before.dailyOrderTarget)
+  })
+
+  it('validates out-of-range simulation inputs', () => {
+    expect(validateSimulationPatch({ grossMarginRate: 1 })).toEqual([
+      { field: 'grossMarginRate', message: '毛利率应在 1%-95% 之间' }
+    ])
+  })
+
+  it('explains lower order pressure when avg order value increases', () => {
+    const result = simulateScenario(model, { avgOrderValue: 30 })
+    expect(result.after.dailyOrderTarget).toBeLessThan(result.before.dailyOrderTarget)
+    expect(result.advice).toContain('所需单量下降')
   })
 })
 

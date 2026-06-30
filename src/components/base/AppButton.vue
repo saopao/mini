@@ -36,8 +36,8 @@ const classes = computed(() => ({
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
-  border-radius: 999px;
+  min-height: 48px;
+  border-radius: var(--radius-xl);
   padding: 0 18px;
   font-size: 14px;
   font-weight: 700;
@@ -49,14 +49,14 @@ const classes = computed(() => ({
 }
 
 .app-button--primary {
-  background: linear-gradient(180deg, #0baa61, #087a43);
+  background: var(--color-brand-primary);
   color: #fff;
-  box-shadow: 0 8px 18px rgba(7, 132, 72, 0.22);
+  box-shadow: var(--shadow-card);
 }
 
 .app-button--secondary {
-  border: 1px solid rgba(7, 155, 85, 0.24);
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
   color: var(--color-brand-dark);
 }
 
@@ -72,7 +72,7 @@ const classes = computed(() => ({
 }
 
 .app-button--disabled {
-  background: #e5e7eb;
+  background: var(--color-border);
   color: var(--color-text-muted);
 }
 </style>

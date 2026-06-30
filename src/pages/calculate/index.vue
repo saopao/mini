@@ -8,12 +8,12 @@
 
       <view class="calculate__form">
         <AppInput v-model="form.shopName" mode="row" icon="店" label="店铺名称（选填）" placeholder="社区咖啡小店" />
-        <AppAmountInput v-model="form.initialInvestment" mode="row" icon="投" label="前期投入（一次性）" :error="errors.initialInvestment" />
-        <AppAmountInput v-model="form.monthlyFixedCost" mode="row" icon="支" label="每月固定支出" :error="errors.monthlyFixedCost" />
-        <AppInput v-model="form.businessDaysPerMonth" mode="row" icon="天" label="营业天数（每月）" input-type="number" unit="天" :error="errors.businessDaysPerMonth" />
-        <AppInput v-model="form.grossMarginRate" mode="row" icon="利" label="行业毛利率" input-type="digit" unit="%" :error="errors.grossMarginRate" />
-        <AppAmountInput v-model="form.avgOrderValue" mode="row" icon="客" label="客单价" :error="errors.avgOrderValue" />
-        <AppInput v-model="form.paybackMonths" mode="row" icon="回" label="预期回本周期" input-type="number" unit="个月" :error="errors.paybackMonths" />
+        <AppAmountInput id="field-initialInvestment" ref="initialInvestmentRef" v-model="form.initialInvestment" mode="row" icon="投" label="前期投入（一次性）" :error="errors.initialInvestment" />
+        <AppAmountInput id="field-monthlyFixedCost" ref="monthlyFixedCostRef" v-model="form.monthlyFixedCost" mode="row" icon="支" label="每月固定支出" :error="errors.monthlyFixedCost" />
+        <AppInput id="field-businessDaysPerMonth" ref="businessDaysRef" v-model="form.businessDaysPerMonth" mode="row" icon="天" label="营业天数（每月）" input-type="number" unit="天" :error="errors.businessDaysPerMonth" />
+        <AppInput id="field-grossMarginRate" ref="grossMarginRef" v-model="form.grossMarginRate" mode="row" icon="利" label="行业毛利率" input-type="digit" unit="%" :error="errors.grossMarginRate" />
+        <AppAmountInput id="field-avgOrderValue" ref="avgOrderRef" v-model="form.avgOrderValue" mode="row" icon="客" label="客单价" :error="errors.avgOrderValue" />
+        <AppInput id="field-paybackMonths" ref="paybackRef" v-model="form.paybackMonths" mode="row" icon="回" label="预期回本周期" input-type="number" unit="个月" :error="errors.paybackMonths" />
         <AppInput v-model="form.maxDailyOrders" mode="row" icon="单" label="最大日单量（选填）" input-type="number" unit="单" />
       </view>
 
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { onBackPress, onShow } from '@dcloudio/uni-app'
 import AppAmountInput from '../../components/base/AppAmountInput.vue'
 import AppButton from '../../components/base/AppButton.vue'
@@ -63,6 +63,21 @@ const form = reactive({
 
 const errors = reactive<Record<string, string>>({})
 let initialSignature = ''
+type FocusableInput = { focus: () => void }
+const initialInvestmentRef = ref<FocusableInput | null>(null)
+const monthlyFixedCostRef = ref<FocusableInput | null>(null)
+const businessDaysRef = ref<FocusableInput | null>(null)
+const grossMarginRef = ref<FocusableInput | null>(null)
+const avgOrderRef = ref<FocusableInput | null>(null)
+const paybackRef = ref<FocusableInput | null>(null)
+const fieldRefs: Record<string, typeof initialInvestmentRef> = {
+  initialInvestment: initialInvestmentRef,
+  monthlyFixedCost: monthlyFixedCostRef,
+  businessDaysPerMonth: businessDaysRef,
+  grossMarginRate: grossMarginRef,
+  avgOrderValue: avgOrderRef,
+  paybackMonths: paybackRef
+}
 
 const selectedIndustryName = computed(() => shopStore.draft.industryName ?? '默认行业')
 
@@ -143,6 +158,7 @@ function submit() {
     errors[String(error.field)] = error.message
   })
   if (validationErrors.length > 0) {
+    focusFirstError(validationErrors[0].field)
     uni.showToast({ title: validationErrors[0].message, icon: 'none' })
     return
   }
@@ -160,6 +176,17 @@ function submit() {
   trackEvent('calculate_submit', { industryId: model.industryId })
   initialSignature = JSON.stringify(form)
   uni.navigateTo({ url: '/pages/report/index' })
+}
+
+function focusFirstError(field: keyof ShopModel | string) {
+  const key = String(field)
+  uni.pageScrollTo({
+    selector: `#field-${key}`,
+    duration: 180
+  })
+  setTimeout(() => {
+    fieldRefs[key]?.value?.focus()
+  }, 220)
 }
 </script>
 

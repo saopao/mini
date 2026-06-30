@@ -103,3 +103,8 @@ export interface SimulationResult {
   patchedModel: ShopModel
   advice: string
 }
+
+export interface SimulationValidationError {
+  field: keyof SimulationPatch
+  message: string
+}

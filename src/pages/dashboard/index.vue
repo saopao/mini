@@ -31,9 +31,12 @@
       <view class="dashboard__section">
         <view class="dashboard__section-head">
           <text>近 7 天流水趋势</text>
-          <text v-if="ledgerStore.records.length < 2">连续记录 2 天后更清晰</text>
+          <text v-if="trendRecordDays < 2">连续记录 2 天后更清晰</text>
         </view>
-        <TrendChart :points="trendPoints" :target="dashboard.dailyRevenueTarget" />
+        <TrendChart v-if="trendRecordDays >= 2" :points="trendPoints" :target="dashboard.dailyRevenueTarget" />
+        <AppEmpty v-else title="趋势数据不足" desc="连续记录 2 天后可查看走势。">
+          <AppButton @click="goLedger">补一笔记录</AppButton>
+        </AppEmpty>
       </view>
 
       <AppCard>
@@ -112,6 +115,7 @@ const metricItems = computed(() => {
 })
 
 const trendPoints = computed(() => dashboard.value?.trend7d.map((item) => ({ date: item.date, value: item.income })) ?? [])
+const trendRecordDays = computed(() => new Set(ledgerStore.records.map((record) => record.date)).size)
 
 onShow(() => {
   shopStore.load()

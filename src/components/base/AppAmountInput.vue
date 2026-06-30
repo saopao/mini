@@ -1,5 +1,6 @@
 <template>
   <AppInput
+    ref="inputRef"
     :label="label"
     :model-value="modelValue"
     :placeholder="placeholder"
@@ -13,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import AppInput from './AppInput.vue'
 
 withDefaults(
@@ -37,8 +39,18 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const inputRef = ref<InstanceType<typeof AppInput> | null>(null)
+
 function handleValue(value: string) {
   const normalized = value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1')
   emit('update:modelValue', normalized)
 }
+
+function focus() {
+  inputRef.value?.focus()
+}
+
+defineExpose({
+  focus
+})
 </script>

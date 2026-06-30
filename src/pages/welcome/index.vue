@@ -41,6 +41,9 @@ const shopStore = useShopStore()
 onShow(() => {
   shopStore.load()
   trackEvent('welcome_view')
+  if (shopStore.currentModel) {
+    uni.switchTab({ url: '/pages/dashboard/index' })
+  }
 })
 
 function startCalculate() {

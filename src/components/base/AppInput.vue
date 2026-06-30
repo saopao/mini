@@ -13,8 +13,9 @@
         :value="modelValue"
         :placeholder="placeholder"
         :maxlength="maxlength"
+        :focus="focused"
         @input="handleInput"
-        @blur="$emit('blur')"
+        @blur="handleBlur"
       />
       <text v-if="mode === 'row' && unit" class="app-input__unit">{{ unit }}</text>
       <text v-if="mode === 'row'" class="app-input__arrow">›</text>
@@ -25,6 +26,8 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick, ref } from 'vue'
+
 withDefaults(
   defineProps<{
     label: string
@@ -54,10 +57,27 @@ const emit = defineEmits<{
   blur: []
 }>()
 
+const focused = ref(false)
+
 function handleInput(event: unknown) {
   const inputEvent = event as { detail?: { value?: string }; target?: { value?: string } }
   emit('update:modelValue', inputEvent.detail?.value ?? inputEvent.target?.value ?? '')
 }
+
+function handleBlur() {
+  focused.value = false
+  emit('blur')
+}
+
+async function focus() {
+  focused.value = false
+  await nextTick()
+  focused.value = true
+}
+
+defineExpose({
+  focus
+})
 </script>
 
 <style scoped lang="scss">

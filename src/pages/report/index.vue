@@ -125,12 +125,19 @@ function saveAndGoDashboard() {
 }
 
 function goLab() {
-  const saved = shopStore.saveDraftAsModel()
-  if (!saved) {
-    uni.showToast({ title: '请先保存有效模型', icon: 'none' })
-    return
-  }
-  uni.switchTab({ url: '/pages/lab/index' })
+  uni.showModal({
+    title: '保存后进入实验室？',
+    content: '实验室需要基于当前经营模型推演，确认后会保存本次测算。',
+    success(result) {
+      if (!result.confirm) return
+      const saved = shopStore.saveDraftAsModel()
+      if (!saved) {
+        uni.showToast({ title: '请先保存有效模型', icon: 'none' })
+        return
+      }
+      uni.switchTab({ url: '/pages/lab/index' })
+    }
+  })
 }
 
 function goEdit() {

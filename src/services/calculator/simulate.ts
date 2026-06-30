@@ -1,4 +1,4 @@
-import type { ShopModel, SimulationPatch, SimulationResult } from './types'
+import type { ShopModel, SimulationPatch, SimulationResult, SimulationValidationError } from './types'
 import { calculateTargets } from './formulas'
 
 export function simulateScenario(model: ShopModel, patch: SimulationPatch): SimulationResult {
@@ -12,6 +12,26 @@ export function simulateScenario(model: ShopModel, patch: SimulationPatch): Simu
     patchedModel,
     advice: buildSimulationAdvice(model, patchedModel, before.dailyRevenueTarget, after.dailyRevenueTarget)
   }
+}
+
+export function validateSimulationPatch(patch: SimulationPatch): SimulationValidationError[] {
+  const errors: SimulationValidationError[] = []
+  if (patch.avgOrderValue !== undefined && patch.avgOrderValue <= 0) {
+    errors.push({ field: 'avgOrderValue', message: '请输入大于 0 的客单价' })
+  }
+  if (patch.dailyOrderTarget !== undefined && (!Number.isInteger(patch.dailyOrderTarget) || patch.dailyOrderTarget <= 0)) {
+    errors.push({ field: 'dailyOrderTarget', message: '日单量应为大于 0 的整数' })
+  }
+  if (patch.grossMarginRate !== undefined && (patch.grossMarginRate < 0.01 || patch.grossMarginRate > 0.95)) {
+    errors.push({ field: 'grossMarginRate', message: '毛利率应在 1%-95% 之间' })
+  }
+  if (patch.monthlyFixedCost !== undefined && patch.monthlyFixedCost < 0) {
+    errors.push({ field: 'monthlyFixedCost', message: '请输入有效的固定支出' })
+  }
+  if (patch.paybackMonths !== undefined && (!Number.isInteger(patch.paybackMonths) || patch.paybackMonths < 1 || patch.paybackMonths > 60)) {
+    errors.push({ field: 'paybackMonths', message: '回本周期应在 1-60 个月之间' })
+  }
+  return errors
 }
 
 function applyPatch(model: ShopModel, patch: SimulationPatch): ShopModel {
@@ -32,6 +52,22 @@ function applyPatch(model: ShopModel, patch: SimulationPatch): ShopModel {
 }
 
 function buildSimulationAdvice(base: ShopModel, next: ShopModel, beforeDailyTarget: number, afterDailyTarget: number): string {
+  const before = calculateTargets(base)
+  const after = calculateTargets(next)
+  const dailyOrderDelta = after.dailyOrderTarget - before.dailyOrderTarget
+
+  if (
+    next.avgOrderValue === base.avgOrderValue &&
+    next.grossMarginRate === base.grossMarginRate &&
+    next.monthlyFixedCost === base.monthlyFixedCost &&
+    next.paybackMonths === base.paybackMonths
+  ) {
+    return '当前方案与基线一致，可以先调整一个变量看压力变化。'
+  }
+  if (dailyOrderDelta < 0) {
+    if (next.avgOrderValue > base.avgOrderValue) return '客单价提高后，达到同一回本线所需单量下降。'
+    return '调整后单量压力下降，但仍需要结合真实客流验证。'
+  }
   if (afterDailyTarget < beforeDailyTarget) {
     if (next.monthlyFixedCost < base.monthlyFixedCost) return '固定支出下降后，日流水压力同步降低。'
     if (next.grossMarginRate > base.grossMarginRate) return '毛利率提升会直接降低回本所需流水。'

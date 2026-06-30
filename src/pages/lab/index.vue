@@ -14,17 +14,17 @@
       <AppCard>
         <text class="lab__section-title">参数调整</text>
         <view class="lab__controls">
-          <AppInput v-model="patch.avgOrderValue" mode="row" icon="客" label="客单价" input-type="digit" unit="元" />
-          <AppInput v-model="patch.dailyOrderTarget" mode="row" icon="单" label="日单量" input-type="number" unit="单" />
-          <AppInput v-model="patch.grossMarginRate" mode="row" icon="利" label="毛利率" input-type="digit" unit="%" />
-          <AppAmountInput v-model="patch.monthlyFixedCost" mode="row" icon="支" label="固定支出（元/月）" />
-          <AppInput v-model="patch.paybackMonths" mode="row" icon="回" label="回本周期" input-type="number" unit="个月" />
+          <AppInput v-model="patch.avgOrderValue" mode="row" icon="客" label="客单价" input-type="digit" unit="元" :error="fieldErrors.avgOrderValue" />
+          <AppInput v-model="patch.dailyOrderTarget" mode="row" icon="单" label="日单量" input-type="number" unit="单" :error="fieldErrors.dailyOrderTarget" />
+          <AppInput v-model="patch.grossMarginRate" mode="row" icon="利" label="毛利率" input-type="digit" unit="%" :error="fieldErrors.grossMarginRate" />
+          <AppAmountInput v-model="patch.monthlyFixedCost" mode="row" icon="支" label="固定支出（元/月）" :error="fieldErrors.monthlyFixedCost" />
+          <AppInput v-model="patch.paybackMonths" mode="row" icon="回" label="回本周期" input-type="number" unit="个月" :error="fieldErrors.paybackMonths" />
         </view>
       </AppCard>
 
       <ScenarioCompare :items="compareItems" />
 
-      <AppToast :message="result.advice" type="warning" />
+      <AppToast :message="labMessage" type="warning" />
 
       <view class="lab__actions">
         <AppButton block @click="adoptScenario">采纳此方案</AppButton>
@@ -53,6 +53,7 @@ import MetricGrid from '../../components/business/MetricGrid.vue'
 import ScenarioCompare from '../../components/business/ScenarioCompare.vue'
 import { trackEvent } from '../../services/analytics/events'
 import type { SimulationPatch } from '../../services/calculator/types'
+import { validateSimulationPatch } from '../../services/calculator/simulate'
 import { useReportStore } from '../../stores/report'
 import { useShopStore } from '../../stores/shop'
 import { formatDelta, formatMoney, formatOrders } from '../../utils/format'
@@ -75,14 +76,28 @@ const patch = reactive({
 
 const model = computed(() => shopStore.currentModel)
 const scenarioPatch = computed<SimulationPatch>(() => ({
-  avgOrderValue: positiveNumber(patch.avgOrderValue),
-  dailyOrderTarget: positiveNumber(patch.dailyOrderTarget),
-  grossMarginRate: positiveNumber(patch.grossMarginRate) ? Number(patch.grossMarginRate) / 100 : undefined,
-  monthlyFixedCost: nonNegativeNumber(patch.monthlyFixedCost),
-  paybackMonths: positiveNumber(patch.paybackMonths)
+  avgOrderValue: optionalNumber(patch.avgOrderValue),
+  dailyOrderTarget: optionalNumber(patch.dailyOrderTarget),
+  grossMarginRate: optionalNumber(patch.grossMarginRate, (value) => value / 100),
+  monthlyFixedCost: optionalNumber(patch.monthlyFixedCost),
+  paybackMonths: optionalNumber(patch.paybackMonths)
 }))
+const validationErrors = computed(() => validateSimulationPatch(scenarioPatch.value))
+const fieldErrors = computed<Record<string, string>>(() =>
+  validationErrors.value.reduce(
+    (errors, error) => ({
+      ...errors,
+      [error.field]: error.message
+    }),
+    {}
+  )
+)
 
-const result = computed(() => (model.value ? reportStore.runScenario(model.value, scenarioPatch.value) : null))
+const result = computed(() => {
+  if (!model.value) return null
+  return reportStore.runScenario(model.value, validationErrors.value.length ? {} : scenarioPatch.value)
+})
+const labMessage = computed(() => validationErrors.value[0]?.message ?? result.value?.advice ?? '')
 const baselineItems = computed(() => {
   if (!result.value || !model.value) return []
   return [
@@ -138,14 +153,10 @@ onShow(() => {
   resetPatch()
 })
 
-function positiveNumber(value: string): number | undefined {
+function optionalNumber(value: string, transform: (value: number) => number = (current) => current): number | undefined {
+  if (value === '') return undefined
   const parsed = Number(value)
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
-}
-
-function nonNegativeNumber(value: string): number | undefined {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined
+  return Number.isFinite(parsed) ? transform(parsed) : undefined
 }
 
 function percentChange(before: number, after: number): number {
@@ -164,6 +175,10 @@ function resetPatch() {
 
 function adoptScenario() {
   if (!result.value) return
+  if (validationErrors.value.length > 0) {
+    uni.showToast({ title: validationErrors.value[0].message, icon: 'none' })
+    return
+  }
   uni.showModal({
     title: '采纳此方案？',
     content: '采纳后会更新当前经营模型，历史记账记录会按新模型重算。',
