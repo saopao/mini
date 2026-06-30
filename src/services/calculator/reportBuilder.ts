@@ -19,10 +19,11 @@ export function buildOperatingReport(model: ShopModel, industry?: IndustryModel)
 
 export function buildDashboardSnapshot(model: ShopModel, records: LedgerRecord[], date: string): DashboardSnapshot {
   const targets = calculateTargets(model)
-  const today = sumRecords(records, date)
+  const modelRecords = records.filter((record) => record.shopId === model.id)
+  const today = sumRecords(modelRecords, date)
   const todayEstimatedProfit = calculateTodayProfit(model, today.income, today.expense)
-  const trend7d = buildTrend(model, records, date)
-  const accumulatedEstimatedProfit = records
+  const trend7d = buildTrend(model, modelRecords, date)
+  const accumulatedEstimatedProfit = modelRecords
     .reduce((byDate, record) => {
       const entry = byDate.get(record.date) ?? { income: 0, expense: 0 }
       if (record.type === 'income') entry.income += record.amount
@@ -47,8 +48,7 @@ export function buildDashboardSnapshot(model: ShopModel, records: LedgerRecord[]
     accumulatedEstimatedProfit: round(accumulated),
     paybackProgress: calculatePaybackProgress(model.initialInvestment, accumulated),
     trend7d,
-    recentRecords: records
-      .filter((record) => record.shopId === model.id)
+    recentRecords: modelRecords
       .slice()
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .slice(0, 5)

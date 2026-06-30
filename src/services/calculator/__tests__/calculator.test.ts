@@ -72,6 +72,22 @@ describe('report and dashboard', () => {
     expect(snapshot.todayEstimatedProfit).toBe(-682.31)
     expect(snapshot.recentRecords.length).toBe(2)
   })
+
+  it('ignores ledger records from other shop models', () => {
+    const records: LedgerRecord[] = [
+      createRecord('income', 200, '2026-06-29'),
+      createRecord('income', 9000, '2026-06-29', 'shop_other'),
+      createRecord('expense', 3000, '2026-06-29', 'shop_other')
+    ]
+    const snapshot = buildDashboardSnapshot(model, records, '2026-06-29')
+    const todayTrend = snapshot.trend7d.find((item) => item.date === '2026-06-29')
+
+    expect(snapshot.todayIncome).toBe(200)
+    expect(snapshot.todayExpense).toBe(0)
+    expect(snapshot.todayEstimatedProfit).toBe(-562.31)
+    expect(todayTrend?.income).toBe(200)
+    expect(snapshot.recentRecords.map((record) => record.shopId)).toEqual([model.id])
+  })
 })
 
 describe('simulation', () => {
@@ -95,10 +111,10 @@ describe('simulation', () => {
   })
 })
 
-function createRecord(type: 'income' | 'expense', amount: number, date: string): LedgerRecord {
+function createRecord(type: 'income' | 'expense', amount: number, date: string, shopId = model.id): LedgerRecord {
   return {
     id: `${type}_${amount}`,
-    shopId: model.id,
+    shopId,
     date,
     type,
     amount,

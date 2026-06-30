@@ -1,50 +1,54 @@
 <template>
   <AppPage tab>
     <view class="profile">
-      <AppCard v-if="model" class="profile__model">
-        <view class="profile__model-row">
-          <text class="profile__model-icon">{{ industryIcon }}</text>
-          <view>
-            <text class="profile__eyebrow">当前经营模型</text>
-            <text class="profile__model-title">{{ model.industryName }}</text>
-            <text class="profile__model-desc">毛利率 {{ formatPercent(model.grossMarginRate) }} · 回本周期 {{ model.paybackMonths }} 月</text>
-            <text class="profile__model-desc">每日目标流水 {{ formatMoney(report?.dailyRevenueTarget ?? 0) }}</text>
+      <StorageRecoveryState v-if="storageIssue" :desc="storageIssueDesc" @retry="retryStorage" @recover="recoverStorageIssue" />
+
+      <template v-else>
+        <AppCard v-if="model" class="profile__model">
+          <view class="profile__model-row">
+            <text class="profile__model-icon">{{ industryIcon }}</text>
+            <view>
+              <text class="profile__eyebrow">当前经营模型</text>
+              <text class="profile__model-title">{{ model.industryName }}</text>
+              <text class="profile__model-desc">毛利率 {{ formatPercent(model.grossMarginRate) }} · 回本周期 {{ model.paybackMonths }} 月</text>
+              <text class="profile__model-desc">每日目标流水 {{ formatMoney(report?.dailyRevenueTarget ?? 0) }}</text>
+            </view>
           </view>
-        </view>
-        <AppButton block @click="goReport">查看经营报告</AppButton>
-      </AppCard>
+          <AppButton block @click="goReport">查看经营报告</AppButton>
+        </AppCard>
 
-      <AppEmpty v-else title="还没有经营模型" desc="先完成一次测算，才能查看看板和实验室。">
-        <AppButton @click="goCalculate">开始测算</AppButton>
-      </AppEmpty>
+        <AppEmpty v-else title="还没有经营模型" desc="先完成一次测算，才能查看看板和实验室。">
+          <AppButton @click="goCalculate">开始测算</AppButton>
+        </AppEmpty>
 
-      <AppCard>
-        <button class="profile__item" @click="goEdit">
-          <text>修改基础参数</text>
-          <text>›</text>
-        </button>
-        <button class="profile__item" @click="goCalculate">
-          <text>重新测算</text>
-          <text>›</text>
-        </button>
-      </AppCard>
+        <AppCard>
+          <button class="profile__item" @click="goEdit">
+            <text>修改基础参数</text>
+            <text>›</text>
+          </button>
+          <button class="profile__item" @click="goCalculate">
+            <text>重新测算</text>
+            <text>›</text>
+          </button>
+        </AppCard>
 
-      <AppCard>
-        <button class="profile__item" @click="showDataInfo">
-          <text>数据说明</text>
-          <text>›</text>
-        </button>
-        <button class="profile__item" @click="showDisclaimer">
-          <text>免责声明</text>
-          <text>›</text>
-        </button>
-        <button class="profile__item" @click="showFeedback">
-          <text>意见反馈</text>
-          <text>›</text>
-        </button>
-      </AppCard>
+        <AppCard>
+          <button class="profile__item" @click="showDataInfo">
+            <text>数据说明</text>
+            <text>›</text>
+          </button>
+          <button class="profile__item" @click="showDisclaimer">
+            <text>免责声明</text>
+            <text>›</text>
+          </button>
+          <button class="profile__item" @click="showFeedback">
+            <text>意见反馈</text>
+            <text>›</text>
+          </button>
+        </AppCard>
 
-      <AppButton block variant="danger" @click="clearData">清空本地数据</AppButton>
+        <AppButton block variant="danger" @click="clearData">清空本地数据</AppButton>
+      </template>
     </view>
   </AppPage>
 </template>
@@ -56,6 +60,7 @@ import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
 import AppPage from '../../components/base/AppPage.vue'
+import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import { getIndustryModel } from '../../constants/industryModels'
 import { trackEvent } from '../../services/analytics/events'
 import { useLedgerStore } from '../../stores/ledger'
@@ -70,6 +75,12 @@ const reportStore = useReportStore()
 const model = computed(() => shopStore.currentModel)
 const report = computed(() => (model.value ? reportStore.buildReportFor(model.value) : null))
 const industryIcon = computed(() => (model.value ? getIndustryModel(model.value.industryId)?.icon ?? '🏪' : '🏪'))
+const storageIssue = computed(() => shopStore.storageError ?? ledgerStore.storageError)
+const storageIssueDesc = computed(() =>
+  shopStore.storageError
+    ? '当前经营模型读取异常。请先重试；仍失败时清空异常模型后重新测算。'
+    : '记账记录读取异常。请先重试；仍失败时清空异常记录后重新开始记账。'
+)
 
 onShow(() => {
   shopStore.load()
@@ -129,6 +140,36 @@ function clearData() {
       ledgerStore.clearRecords()
       uni.showToast({ title: '已清空本地数据', icon: 'none' })
       uni.reLaunch({ url: '/pages/welcome/index' })
+    }
+  })
+}
+
+function retryStorage() {
+  shopStore.load()
+  ledgerStore.load()
+  if (!storageIssue.value) {
+    uni.showToast({ title: '读取成功', icon: 'none' })
+  }
+}
+
+function recoverStorageIssue() {
+  const shouldClearModel = Boolean(shopStore.storageError)
+  const shouldClearRecords = Boolean(ledgerStore.storageError)
+  uni.showModal({
+    title: '清空异常数据？',
+    content: shouldClearModel ? '清空后需要重新完成开店测算，记账记录也会同步清空。' : '清空后会删除异常记账记录，之后可重新记账。',
+    success(result) {
+      if (!result.confirm) return
+      if (shouldClearModel) {
+        shopStore.recoverStorage()
+        ledgerStore.clearRecords()
+      } else if (shouldClearRecords) {
+        ledgerStore.recoverStorage()
+      }
+      uni.showToast({ title: '异常数据已清空', icon: 'none' })
+      if (shouldClearModel) {
+        uni.reLaunch({ url: '/pages/welcome/index' })
+      }
     }
   })
 }

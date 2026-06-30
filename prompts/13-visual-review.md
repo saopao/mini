@@ -5,6 +5,7 @@
 - `docs/02-reference-board.md`
 - `docs/03-design-system.md`
 - `docs/09-visual-review.md`
+- `docs/12-cross-platform-ui-consistency.md`
 - `reference/design-reference.png`
 
 任务：
@@ -27,7 +28,9 @@
 7. 按钮位置
 8. 数据突出程度
 9. 与设计系统一致性
-10. 微信小程序可用性
+10. 是否通过 Wot Design Uni 和项目基础组件统一通用控件
+11. H5 与微信小程序端卡片、按钮、输入框、背景和安全区一致性
+12. 微信小程序可用性
 
 输出格式：
 
@@ -56,6 +59,6 @@ xx / 100
 限制：
 
 - 不要建议新增颜色。
-- 不要建议引入大型 UI 库。
+- 不要建议引入 Wot Design Uni 之外的通用 UI 库。
 - 不要建议改业务范围。
 - 不要泛泛地说“更高级”，必须给具体修改点。

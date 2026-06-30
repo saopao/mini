@@ -2,7 +2,13 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { getIndustryModel, industryModels } from '../constants/industryModels'
 import { createId, nowIso } from '../utils/date'
-import { shopRepository } from '../services/repository/localStorageRepo'
+import {
+  getStorageError,
+  recoverStorageKey,
+  shopRepository,
+  STORAGE_KEYS,
+  type StorageErrorState
+} from '../services/repository/localStorageRepo'
 import type { ShopModel, ShopStatus } from '../services/calculator/types'
 
 export interface ShopDraft {
@@ -22,14 +28,27 @@ export interface ShopDraft {
 
 export const useShopStore = defineStore('shop', () => {
   const currentModel = ref<ShopModel | null>(null)
+  const storageError = ref<StorageErrorState | null>(null)
   const draft = ref<ShopDraft>({
     status: 'planning'
   })
 
   const hasModel = computed(() => Boolean(currentModel.value))
+  const hasStorageError = computed(() => Boolean(storageError.value))
+
+  function syncStorageError() {
+    storageError.value = getStorageError(STORAGE_KEYS.shopModel)
+  }
 
   function load() {
-    currentModel.value = shopRepository.get()
+    const model = shopRepository.get()
+    syncStorageError()
+    if (storageError.value) {
+      currentModel.value = null
+      draft.value = { status: 'planning' }
+      return
+    }
+    currentModel.value = model
     if (currentModel.value) {
       draft.value = { ...currentModel.value }
     }
@@ -108,6 +127,7 @@ export const useShopStore = defineStore('shop', () => {
     if (!model) return null
     currentModel.value = model
     shopRepository.set(model)
+    syncStorageError()
     draft.value = { ...model }
     return model
   }
@@ -116,17 +136,28 @@ export const useShopStore = defineStore('shop', () => {
     currentModel.value = null
     draft.value = { status: 'planning' }
     shopRepository.remove()
+    syncStorageError()
+  }
+
+  function recoverStorage() {
+    recoverStorageKey(STORAGE_KEYS.shopModel)
+    currentModel.value = null
+    draft.value = { status: 'planning' }
+    syncStorageError()
   }
 
   return {
     currentModel,
+    storageError,
     draft,
     hasModel,
+    hasStorageError,
     load,
     selectIndustry,
     updateDraft,
     createModelFromDraft,
     saveDraftAsModel,
-    clearModel
+    clearModel,
+    recoverStorage
   }
 })

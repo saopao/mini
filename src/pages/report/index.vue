@@ -41,6 +41,7 @@
           <text class="report__toggle">{{ formulaOpen ? '收起' : '展开' }}</text>
         </view>
         <view v-if="formulaOpen" class="report__formula">
+          <text>本次输入：前期投入 {{ formatMoney(model.initialInvestment) }}，每月固定支出 {{ formatMoney(model.monthlyFixedCost) }}，营业 {{ model.businessDaysPerMonth }} 天/月，毛利率 {{ formatPercent(model.grossMarginRate) }}，客单价 {{ formatMoney(model.avgOrderValue) }}，回本周期 {{ model.paybackMonths }} 个月。</text>
           <text>每月目标利润 = 前期投入 / 回本周期</text>
           <text>月毛利目标 = 每月固定支出 + 每月目标利润</text>
           <text>月流水目标 = 月毛利目标 / 毛利率</text>

@@ -1,18 +1,37 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { LedgerRecord, LedgerType } from '../services/calculator/types'
-import { ledgerRepository } from '../services/repository/localStorageRepo'
+import {
+  getStorageError,
+  ledgerRepository,
+  recoverStorageKey,
+  STORAGE_KEYS,
+  type StorageErrorState
+} from '../services/repository/localStorageRepo'
 import { createId, nowIso, todayString } from '../utils/date'
 
 export const useLedgerStore = defineStore('ledger', () => {
   const records = ref<LedgerRecord[]>([])
   const editingRecordId = ref<string | null>(null)
+  const storageError = ref<StorageErrorState | null>(null)
 
   const hasRecords = computed(() => records.value.length > 0)
   const editingRecord = computed(() => records.value.find((record) => record.id === editingRecordId.value) ?? null)
+  const hasStorageError = computed(() => Boolean(storageError.value))
+
+  function syncStorageError() {
+    storageError.value = getStorageError(STORAGE_KEYS.ledgerRecords)
+  }
 
   function load() {
-    records.value = ledgerRepository.list()
+    const nextRecords = ledgerRepository.list()
+    syncStorageError()
+    if (storageError.value) {
+      records.value = []
+      editingRecordId.value = null
+      return
+    }
+    records.value = nextRecords
   }
 
   function addRecord(input: {
@@ -37,6 +56,7 @@ export const useLedgerStore = defineStore('ledger', () => {
     }
     records.value = [record, ...records.value]
     ledgerRepository.setAll(records.value)
+    syncStorageError()
     return record
   }
 
@@ -50,17 +70,27 @@ export const useLedgerStore = defineStore('ledger', () => {
         : item
     )
     ledgerRepository.setAll(records.value)
+    syncStorageError()
   }
 
   function removeRecord(id: string) {
     records.value = records.value.filter((record) => record.id !== id)
     ledgerRepository.setAll(records.value)
+    syncStorageError()
   }
 
   function clearRecords() {
     records.value = []
     editingRecordId.value = null
     ledgerRepository.clear()
+    syncStorageError()
+  }
+
+  function recoverStorage() {
+    records.value = []
+    editingRecordId.value = null
+    recoverStorageKey(STORAGE_KEYS.ledgerRecords)
+    syncStorageError()
   }
 
   function setEditingRecord(id: string | null) {
@@ -69,7 +99,9 @@ export const useLedgerStore = defineStore('ledger', () => {
 
   return {
     records,
+    storageError,
     hasRecords,
+    hasStorageError,
     editingRecordId,
     editingRecord,
     load,
@@ -77,6 +109,7 @@ export const useLedgerStore = defineStore('ledger', () => {
     updateRecord,
     removeRecord,
     clearRecords,
+    recoverStorage,
     setEditingRecord
   }
 })

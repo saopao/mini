@@ -1,6 +1,8 @@
 <template>
   <AppPage tab>
-    <view v-if="model && result" class="lab">
+    <StorageRecoveryState v-if="storageIssue" desc="当前经营模型读取异常。请先重试；仍失败时清空异常模型后重新测算。" @retry="retryStorage" @recover="recoverStorageIssue" />
+
+    <view v-else-if="model && result" class="lab">
       <AppSegmented v-model="mode" :options="modeOptions" />
 
       <AppCard>
@@ -29,6 +31,7 @@
       <view class="lab__actions">
         <AppButton block @click="adoptScenario">采纳此方案</AppButton>
         <AppButton block variant="secondary" @click="resetPatch">恢复当前模型</AppButton>
+        <AppButton block variant="ghost" @click="goReport">查看报告</AppButton>
       </view>
     </view>
 
@@ -51,14 +54,17 @@ import AppSegmented from '../../components/base/AppSegmented.vue'
 import AppToast from '../../components/base/AppToast.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'
 import ScenarioCompare from '../../components/business/ScenarioCompare.vue'
+import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import { trackEvent } from '../../services/analytics/events'
 import type { SimulationPatch } from '../../services/calculator/types'
 import { validateSimulationPatch } from '../../services/calculator/simulate'
+import { useLedgerStore } from '../../stores/ledger'
 import { useReportStore } from '../../stores/report'
 import { useShopStore } from '../../stores/shop'
 import { formatDelta, formatMoney, formatOrders } from '../../utils/format'
 
 const shopStore = useShopStore()
+const ledgerStore = useLedgerStore()
 const reportStore = useReportStore()
 const mode = ref('simulate')
 const modeOptions = [
@@ -75,6 +81,7 @@ const patch = reactive({
 })
 
 const model = computed(() => shopStore.currentModel)
+const storageIssue = computed(() => shopStore.storageError)
 const scenarioPatch = computed<SimulationPatch>(() => ({
   avgOrderValue: optionalNumber(patch.avgOrderValue),
   dailyOrderTarget: optionalNumber(patch.dailyOrderTarget),
@@ -196,6 +203,34 @@ function adoptScenario() {
 function goCalculate() {
   uni.navigateTo({ url: '/pages/industry/index' })
 }
+
+function goReport() {
+  if (!model.value) return
+  shopStore.updateDraft(model.value)
+  uni.navigateTo({ url: '/pages/report/index' })
+}
+
+function retryStorage() {
+  shopStore.load()
+  resetPatch()
+  if (!storageIssue.value) {
+    uni.showToast({ title: '读取成功', icon: 'none' })
+  }
+}
+
+function recoverStorageIssue() {
+  uni.showModal({
+    title: '清空异常数据？',
+    content: '清空后需要重新完成开店测算，记账记录也会同步清空。',
+    success(result) {
+      if (!result.confirm) return
+      shopStore.recoverStorage()
+      ledgerStore.clearRecords()
+      uni.showToast({ title: '异常数据已清空', icon: 'none' })
+      uni.reLaunch({ url: '/pages/welcome/index' })
+    }
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -243,7 +278,13 @@ function goCalculate() {
 
 .lab__actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 10px;
+}
+
+@media (min-width: 360px) {
+  .lab__actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 </style>

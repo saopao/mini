@@ -7,14 +7,17 @@
       </view>
     </view>
     <view class="app-input__value">
-      <input
-        class="app-input__control"
+      <wd-input
+        custom-class="app-input__wd"
+        custom-input-class="app-input__control"
         :type="inputType"
-        :value="modelValue"
+        :model-value="modelValue"
         :placeholder="placeholder"
         :maxlength="maxlength"
         :focus="focused"
-        @input="handleInput"
+        :no-border="true"
+        :align-right="mode === 'row'"
+        @update:modelValue="handleInput"
         @blur="handleBlur"
       />
       <text v-if="mode === 'row' && unit" class="app-input__unit">{{ unit }}</text>
@@ -59,9 +62,8 @@ const emit = defineEmits<{
 
 const focused = ref(false)
 
-function handleInput(event: unknown) {
-  const inputEvent = event as { detail?: { value?: string }; target?: { value?: string } }
-  emit('update:modelValue', inputEvent.detail?.value ?? inputEvent.target?.value ?? '')
+function handleInput(value: string | number) {
+  emit('update:modelValue', String(value ?? ''))
 }
 
 function handleBlur() {
@@ -83,13 +85,16 @@ defineExpose({
 <style scoped lang="scss">
 .app-input {
   position: relative;
-  border: 1px solid var(--color-border);
+  border: 1px solid #e5eee9;
+  border-color: var(--color-border);
+  border-radius: 10px;
   border-radius: var(--radius-md);
   background: #fff;
   padding: 11px 12px;
 }
 
 .app-input--error {
+  border-color: #ef4444;
   border-color: var(--color-danger);
 }
 
@@ -127,17 +132,20 @@ defineExpose({
   width: 22px;
   height: 22px;
   border-radius: 7px;
+  background: #effaf3;
   background: var(--color-success-bg);
   font-size: 13px;
 }
 
 .app-input__label {
+  color: #17211c;
   color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 600;
 }
 
 .app-input__unit {
+  color: #9aa7a0;
   color: var(--color-text-muted);
   font-size: 12px;
 }
@@ -148,16 +156,31 @@ defineExpose({
   right: 12px;
 }
 
-.app-input__control {
+.app-input__value {
+  min-width: 0;
+}
+
+:deep(.app-input__wd) {
+  width: 100%;
+  background: transparent;
+}
+
+:deep(.app-input__wd .wd-input__body) {
+  min-width: 0;
+  width: 100%;
+}
+
+:deep(.app-input__wd .wd-input__value) {
+  width: 100%;
+}
+
+:deep(.app-input__control) {
   width: 100%;
   height: 27px;
+  color: #17211c;
   color: var(--color-text-primary);
   font-size: 17px;
   font-weight: 700;
-}
-
-.app-input__value {
-  min-width: 0;
 }
 
 .app-input--row .app-input__value {
@@ -168,9 +191,15 @@ defineExpose({
   gap: 4px;
 }
 
-.app-input--row .app-input__control {
+.app-input--row :deep(.app-input__wd) {
+  width: 86px;
+  flex: 0 0 86px;
+}
+
+.app-input--row :deep(.app-input__control) {
   width: 86px;
   height: 44px;
+  color: #17211c;
   color: var(--color-text-primary);
   font-size: 14px;
   font-weight: 700;
@@ -182,6 +211,7 @@ defineExpose({
 }
 
 .app-input__arrow {
+  color: #9aa7a0;
   color: var(--color-text-muted);
   font-size: 18px;
   line-height: 1;
@@ -190,6 +220,7 @@ defineExpose({
 .app-input__error {
   display: block;
   margin-top: 8px;
+  color: #ef4444;
   color: var(--color-danger);
   font-size: 12px;
 }

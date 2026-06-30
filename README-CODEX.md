@@ -26,6 +26,7 @@
 - `docs/02-reference-board.md`
 - `docs/03-design-system.md`
 - `docs/09-visual-review.md`
+- `docs/12-cross-platform-ui-consistency.md`
 - `reference/design-reference.png`
 
 工程相关：
@@ -80,6 +81,7 @@
 - TypeScript
 - Pinia
 - SCSS
+- Wot Design Uni
 - 微信小程序优先
 
 如果改用其他技术栈，必须先更新：

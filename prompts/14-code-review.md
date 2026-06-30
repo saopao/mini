@@ -6,6 +6,7 @@
 
 - `AGENTS.md`
 - `docs/03-design-system.md`
+- `docs/12-cross-platform-ui-consistency.md`
 - `docs/05-data-model-and-formulas.md`
 - `docs/06-page-acceptance.md`
 - `docs/10-test-cases.md`
@@ -19,7 +20,9 @@
 - 是否违反 design tokens。
 - 是否新增随机颜色。
 - 是否重复写按钮/卡片样式。
+- 是否绕过 Wot Design Uni 和项目基础组件另写通用控件。
 - 间距、圆角、字号是否统一。
+- 基础组件是否有跨端 fallback，不只依赖 CSS 变量。
 
 ## 角色 2：产品体验审查
 
@@ -49,6 +52,8 @@
 - rpx、safe area、tabBar 是否正确。
 - 输入框和键盘是否可能遮挡。
 - 页面生命周期是否合理。
+- `button / input / textarea` 默认样式是否已 reset。
+- 卡片、按钮、输入框在 H5 和微信小程序端是否可能出现明显差异。
 
 输出格式：
 

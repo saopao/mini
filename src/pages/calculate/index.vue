@@ -8,6 +8,7 @@
 
       <view class="calculate__form">
         <AppInput v-model="form.shopName" mode="row" icon="店" label="店铺名称（选填）" placeholder="社区咖啡小店" />
+        <AppInput v-model="form.city" mode="row" icon="城" label="所在城市（选填）" placeholder="上海" />
         <AppAmountInput id="field-initialInvestment" ref="initialInvestmentRef" v-model="form.initialInvestment" mode="row" icon="投" label="前期投入（一次性）" :error="errors.initialInvestment" />
         <AppAmountInput id="field-monthlyFixedCost" ref="monthlyFixedCostRef" v-model="form.monthlyFixedCost" mode="row" icon="支" label="每月固定支出" :error="errors.monthlyFixedCost" />
         <AppInput id="field-businessDaysPerMonth" ref="businessDaysRef" v-model="form.businessDaysPerMonth" mode="row" icon="天" label="营业天数（每月）" input-type="number" unit="天" :error="errors.businessDaysPerMonth" />
@@ -52,6 +53,7 @@ import { createId, nowIso } from '../../utils/date'
 const shopStore = useShopStore()
 const form = reactive({
   shopName: '',
+  city: '',
   initialInvestment: '',
   monthlyFixedCost: '',
   businessDaysPerMonth: '',
@@ -104,6 +106,7 @@ onShow(() => {
     shopStore.selectIndustry('tea_drink')
   }
   form.shopName = shopStore.draft.shopName ?? ''
+  form.city = shopStore.draft.city ?? ''
   form.initialInvestment = String(shopStore.draft.initialInvestment ?? '')
   form.monthlyFixedCost = String(shopStore.draft.monthlyFixedCost ?? '')
   form.businessDaysPerMonth = String(shopStore.draft.businessDaysPerMonth ?? '')
@@ -132,6 +135,7 @@ function buildModel(): ShopModel | null {
   return {
     id: shopStore.currentModel?.id ?? createId('draft'),
     shopName: form.shopName || undefined,
+    city: form.city || undefined,
     industryId: shopStore.draft.industryId,
     industryName: shopStore.draft.industryName,
     status: shopStore.draft.status,
@@ -165,6 +169,7 @@ function submit() {
 
   shopStore.updateDraft({
     shopName: model.shopName,
+    city: model.city,
     initialInvestment: model.initialInvestment,
     monthlyFixedCost: model.monthlyFixedCost,
     businessDaysPerMonth: model.businessDaysPerMonth,

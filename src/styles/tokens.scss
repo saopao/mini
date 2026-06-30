@@ -35,7 +35,8 @@ $font-metric-l: 22px;
 $font-body: 14px;
 $font-caption: 12px;
 
-:root {
+:root,
+page {
   --color-brand-primary: #{$color-brand-primary};
   --color-brand-dark: #{$color-brand-dark};
   --color-brand-light: #{$color-brand-light};

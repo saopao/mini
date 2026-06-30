@@ -1,47 +1,62 @@
 <template>
-  <view class="app-segmented">
-    <button
-      v-for="option in options"
-      :key="option.value"
-      class="app-segmented__item"
-      :class="{ 'app-segmented__item--active': modelValue === option.value }"
-      @click="$emit('update:modelValue', option.value)"
-    >
-      {{ option.label }}
-    </button>
-  </view>
+  <wd-segmented :value="modelValue" :options="wotOptions" size="small" custom-class="app-segmented" @update:value="handleUpdate">
+    <template #label="{ option }">
+      {{ option.payload?.label ?? option.value }}
+    </template>
+  </wd-segmented>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
   modelValue: string
   options: Array<{ label: string; value: string }>
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+const wotOptions = computed(() =>
+  props.options.map((option) => ({
+    value: option.value,
+    payload: {
+      label: option.label
+    }
+  }))
+)
+
+function handleUpdate(value: string | number) {
+  emit('update:modelValue', String(value))
+}
 </script>
 
 <style scoped lang="scss">
-.app-segmented {
-  display: flex;
+:deep(.app-segmented) {
   min-height: 36px;
+  border-radius: 20px;
   border-radius: var(--radius-xl);
   background: var(--color-success-bg);
   padding: 3px;
 }
 
-.app-segmented__item {
-  flex: 1;
+:deep(.app-segmented .wd-segmented__item) {
   border-radius: var(--radius-lg);
   color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 700;
+  line-height: 30px;
+  min-height: 30px;
 }
 
-.app-segmented__item--active {
+:deep(.app-segmented .wd-segmented__item.is-active) {
+  color: #fff;
+}
+
+:deep(.app-segmented .wd-segmented__item--active) {
   background: var(--color-brand-primary);
+  border-radius: var(--radius-lg);
   color: #fff;
   box-shadow: var(--shadow-card);
 }

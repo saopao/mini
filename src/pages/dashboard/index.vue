@@ -1,6 +1,8 @@
 <template>
   <AppPage tab>
-    <view v-if="model && dashboard" class="dashboard">
+    <StorageRecoveryState v-if="storageIssue" :desc="storageIssueDesc" @retry="retryStorage" @recover="recoverStorageIssue" />
+
+    <view v-else-if="model && dashboard" class="dashboard">
       <AppCard
         class="dashboard__hero"
         :class="{ 'dashboard__hero--done': dashboard.todayIncome >= dashboard.dailyRevenueTarget }"
@@ -23,7 +25,7 @@
 
       <ProgressCard
         label="回本进度"
-        :value="formatPercent(dashboard.paybackProgress)"
+        :value="paybackProgressText"
         :percent="dashboard.paybackProgress * 100"
         :desc="dashboard.accumulatedEstimatedProfit < 0 ? '累计估算利润仍为负，请优先看支出。' : `已回收 ${formatMoney(dashboard.accumulatedEstimatedProfit)}`"
       />
@@ -57,6 +59,7 @@
 
       <view class="dashboard__actions">
         <AppButton block @click="goLedger">记一笔</AppButton>
+        <AppButton block variant="secondary" @click="goReport">查看报告</AppButton>
         <AppButton block variant="secondary" @click="goLab">去实验室</AppButton>
       </view>
     </view>
@@ -76,6 +79,7 @@ import AppEmpty from '../../components/base/AppEmpty.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'
 import ProgressCard from '../../components/business/ProgressCard.vue'
+import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import TrendChart from '../../components/business/TrendChart.vue'
 import { trackEvent } from '../../services/analytics/events'
 import { useLedgerStore } from '../../stores/ledger'
@@ -89,6 +93,12 @@ const reportStore = useReportStore()
 
 const model = computed(() => shopStore.currentModel)
 const dashboard = computed(() => reportStore.dashboard)
+const storageIssue = computed(() => shopStore.storageError ?? ledgerStore.storageError)
+const storageIssueDesc = computed(() =>
+  shopStore.storageError
+    ? '当前经营模型读取异常。请先重试；仍失败时清空异常模型后重新测算。'
+    : '记账记录读取异常。请先重试；仍失败时清空异常记录后重新开始记账。'
+)
 const statusTitle = computed(() => {
   if (!dashboard.value) return ''
   if (dashboard.value.todayIncome >= dashboard.value.dailyRevenueTarget) return '已达标，超过回本线'
@@ -109,13 +119,20 @@ const metricItems = computed(() => {
     { label: '今日利润', value: formatMoney(dashboard.value.todayEstimatedProfit) },
     { label: '目标流水', value: formatMoney(dashboard.value.dailyRevenueTarget) },
     { label: '完成率', value: formatPercent(dashboard.value.completionRate) },
-    { label: '回本进度', value: formatPercent(dashboard.value.paybackProgress) },
+    { label: '回本进度', value: paybackProgressText.value },
     { label: '今日支出', value: formatMoney(dashboard.value.todayExpense) }
   ]
 })
 
 const trendPoints = computed(() => dashboard.value?.trend7d.map((item) => ({ date: item.date, value: item.income })) ?? [])
 const trendRecordDays = computed(() => new Set(ledgerStore.records.map((record) => record.date)).size)
+const paybackProgressText = computed(() => {
+  if (!dashboard.value) return '0%'
+  if (dashboard.value.paybackProgress < 0 && Math.abs(dashboard.value.paybackProgress) < 0.01) {
+    return formatPercent(dashboard.value.paybackProgress, 1)
+  }
+  return formatPercent(dashboard.value.paybackProgress)
+})
 
 onShow(() => {
   shopStore.load()
@@ -131,8 +148,44 @@ function goLedger() {
   uni.switchTab({ url: '/pages/ledger/index' })
 }
 
+function goReport() {
+  if (!model.value) return
+  shopStore.updateDraft(model.value)
+  uni.navigateTo({ url: '/pages/report/index' })
+}
+
 function goLab() {
   uni.switchTab({ url: '/pages/lab/index' })
+}
+
+function retryStorage() {
+  shopStore.load()
+  ledgerStore.load()
+  if (!storageIssue.value) {
+    uni.showToast({ title: '读取成功', icon: 'none' })
+  }
+}
+
+function recoverStorageIssue() {
+  const shouldClearModel = Boolean(shopStore.storageError)
+  const shouldClearRecords = Boolean(ledgerStore.storageError)
+  uni.showModal({
+    title: '清空异常数据？',
+    content: shouldClearModel ? '清空后需要重新完成开店测算，记账记录也会同步清空。' : '清空后会删除异常记账记录，看板会按空记录重新开始。',
+    success(result) {
+      if (!result.confirm) return
+      if (shouldClearModel) {
+        shopStore.recoverStorage()
+        ledgerStore.clearRecords()
+      } else if (shouldClearRecords) {
+        ledgerStore.recoverStorage()
+      }
+      uni.showToast({ title: '异常数据已清空', icon: 'none' })
+      if (shouldClearModel) {
+        uni.reLaunch({ url: '/pages/welcome/index' })
+      }
+    }
+  })
 }
 
 function editRecord(id: string) {
@@ -221,7 +274,13 @@ function editRecord(id: string) {
 
 .dashboard__actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 9px;
+}
+
+@media (min-width: 360px) {
+  .dashboard__actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 </style>

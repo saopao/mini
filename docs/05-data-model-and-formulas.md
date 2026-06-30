@@ -11,6 +11,7 @@
 - TypeScript
 - Pinia
 - SCSS
+- Wot Design Uni
 - 微信小程序优先
 
 若后续改用 Taro、原生微信小程序或其他方案，应先更新本文、`docs/08-codex-workflow.md` 和 `AGENTS.md`。
@@ -255,6 +256,7 @@ V1 先定义事件，不强依赖第三方 SDK。
 - 已采用 uni-app + Vue 3 + TypeScript。
 - 已使用 Pinia。
 - 已使用 SCSS。
+- 已采用 Wot Design Uni 作为主 UI 组件框架。
 - 图表当前采用自研轻量组件。
 - 单元测试当前使用 Vitest。
 - 当前以 H5 预览端优先验证功能闭环。

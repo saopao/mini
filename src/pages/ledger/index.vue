@@ -1,6 +1,8 @@
 <template>
   <AppPage tab>
-    <view v-if="model" class="ledger">
+    <StorageRecoveryState v-if="storageIssue" :desc="storageIssueDesc" @retry="retryStorage" @recover="recoverStorageIssue" />
+
+    <view v-else-if="model" class="ledger">
       <AppSegmented v-model="form.type" :options="typeOptions" />
 
       <AppCard>
@@ -87,6 +89,7 @@ import AppPage from '../../components/base/AppPage.vue'
 import AppSegmented from '../../components/base/AppSegmented.vue'
 import AppToast from '../../components/base/AppToast.vue'
 import MetricCard from '../../components/business/MetricCard.vue'
+import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import { expenseCategories, incomeCategories, quickAmounts } from '../../constants/categories'
 import { trackEvent } from '../../services/analytics/events'
 import type { LedgerType } from '../../services/calculator/types'
@@ -116,6 +119,12 @@ const typeOptions = [
 ]
 
 const model = computed(() => shopStore.currentModel)
+const storageIssue = computed(() => shopStore.storageError ?? ledgerStore.storageError)
+const storageIssueDesc = computed(() =>
+  shopStore.storageError
+    ? '当前经营模型读取异常。请先重试；仍失败时清空异常模型后重新测算。'
+    : '记账记录读取异常。请先重试；仍失败时清空异常记录后重新开始记账。'
+)
 const editing = computed(() => ledgerStore.editingRecord)
 const categories = computed(() => (form.type === 'income' ? incomeCategories : expenseCategories))
 const todaySnapshot = computed(() => reportStore.buildDashboardFor(form.date))
@@ -237,6 +246,36 @@ function editRecord(id: string) {
 
 function goCalculate() {
   uni.navigateTo({ url: '/pages/industry/index' })
+}
+
+function retryStorage() {
+  shopStore.load()
+  ledgerStore.load()
+  if (!storageIssue.value) {
+    uni.showToast({ title: '读取成功', icon: 'none' })
+  }
+}
+
+function recoverStorageIssue() {
+  const shouldClearModel = Boolean(shopStore.storageError)
+  const shouldClearRecords = Boolean(ledgerStore.storageError)
+  uni.showModal({
+    title: '清空异常数据？',
+    content: shouldClearModel ? '清空后需要重新完成开店测算，记账记录也会同步清空。' : '清空后会删除异常记账记录，之后可重新记账。',
+    success(result) {
+      if (!result.confirm) return
+      if (shouldClearModel) {
+        shopStore.recoverStorage()
+        ledgerStore.clearRecords()
+      } else if (shouldClearRecords) {
+        ledgerStore.recoverStorage()
+      }
+      uni.showToast({ title: '异常数据已清空', icon: 'none' })
+      if (shouldClearModel) {
+        uni.reLaunch({ url: '/pages/welcome/index' })
+      }
+    }
+  })
 }
 </script>
 

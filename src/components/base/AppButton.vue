@@ -1,7 +1,16 @@
 <template>
-  <button class="app-button" :class="classes" :disabled="disabled" @click="$emit('click')">
+  <wd-button
+    :type="wotType"
+    :plain="wotPlain"
+    :round="false"
+    size="large"
+    :block="block"
+    :disabled="disabled"
+    :custom-class="wotClass"
+    @click="handleClick"
+  >
     <slot />
-  </button>
+  </wd-button>
 </template>
 
 <script setup lang="ts">
@@ -20,59 +29,95 @@ const props = withDefaults(
   }
 )
 
-defineEmits<{
+const emit = defineEmits<{
   click: []
 }>()
 
-const classes = computed(() => ({
-  [`app-button--${props.variant}`]: true,
-  'app-button--block': props.block,
-  'app-button--disabled': props.disabled
-}))
+const wotType = computed(() => (props.variant === 'danger' ? 'error' : 'primary'))
+const wotPlain = computed(() => props.variant === 'secondary' || props.variant === 'ghost')
+
+const wotClass = computed(() =>
+  [
+    'app-button',
+    `app-button--${props.variant}`,
+    props.block ? 'app-button--block' : '',
+    props.disabled ? 'app-button--disabled' : ''
+  ]
+    .filter(Boolean)
+    .join(' ')
+)
+
+function handleClick() {
+  if (!props.disabled) {
+    emit('click')
+  }
+}
 </script>
 
 <style scoped lang="scss">
-.app-button {
-  display: inline-flex;
+:deep(.app-button) {
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: 48px !important;
+  height: 48px !important;
+  border-radius: 16px;
   border-radius: var(--radius-xl);
   padding: 0 18px;
+  color: inherit;
   font-size: 14px;
   font-weight: 700;
+  line-height: 1.2;
   box-shadow: none;
 }
 
-.app-button--block {
-  width: 100%;
+:deep(.app-button--block) {
+  width: 100% !important;
+  display: flex !important;
 }
 
-.app-button--primary {
-  background: var(--color-brand-primary);
+:deep(.app-button--primary) {
+  background: #079b55 !important;
+  background: var(--color-brand-primary) !important;
   color: #fff;
+  box-shadow: 0 8px 22px rgba(21, 48, 36, 0.07);
   box-shadow: var(--shadow-card);
 }
 
-.app-button--secondary {
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-card);
-  color: var(--color-brand-dark);
+:deep(.app-button--secondary) {
+  border: 1px solid #e5eee9;
+  border-color: var(--color-border);
+  background: #fff !important;
+  background: var(--color-bg-card) !important;
+  color: #06733f !important;
+  color: var(--color-brand-dark) !important;
 }
 
-.app-button--ghost {
-  background: transparent;
-  color: var(--color-brand-dark);
+:deep(.app-button--ghost) {
+  border: 0;
+  background: transparent !important;
+  color: #06733f !important;
+  color: var(--color-brand-dark) !important;
 }
 
-.app-button--danger {
+:deep(.app-button--danger) {
+  border-radius: 10px;
   border-radius: var(--radius-md);
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
+  background: #fef2f2 !important;
+  background: var(--color-danger-bg) !important;
+  color: #ef4444 !important;
+  color: var(--color-danger) !important;
 }
 
-.app-button--disabled {
-  background: var(--color-border);
-  color: var(--color-text-muted);
+:deep(.app-button--disabled) {
+  opacity: 1 !important;
+  background: #e5eee9 !important;
+  background: var(--color-border) !important;
+  color: #9aa7a0 !important;
+  color: var(--color-text-muted) !important;
+}
+
+:deep(.app-button .wd-button__text) {
+  white-space: normal;
 }
 </style>

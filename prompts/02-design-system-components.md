@@ -5,6 +5,7 @@
 - `AGENTS.md`
 - `docs/02-reference-board.md`
 - `docs/03-design-system.md`
+- `docs/12-cross-platform-ui-consistency.md`
 - `reference/design-reference.png`
 
 任务：
@@ -45,13 +46,19 @@ src/components/business/ScenarioCompare.vue
 
 1. 所有颜色来自 `tokens.scss`。
 2. 所有圆角、间距、字号来自 `tokens.scss`。
-3. `AppButton` 支持 `primary / secondary / ghost / danger`。
-4. `AppCard` 支持 `default / emphasis / warning / danger`。
-5. `AppInput` 支持错误提示。
-6. `AppAmountInput` 支持金额输入和两位小数。
-7. 不实现业务页面。
-8. 不引入大型 UI 库。
-9. 不新增未定义颜色。
+3. Wot Design Uni 是主 UI 框架，先完成 `wot-design-uni` 依赖、easycom 和类型声明。
+4. `AppButton`、`AppInput`、弹窗、Toast、选择器等通用控件优先封装 Wot Design Uni。
+5. Wot Design Uni 未覆盖的业务展示组件才使用自定义 SCSS。
+6. 基础组件关键自定义样式必须有静态 fallback，再用 token 覆盖。
+7. `tokens.scss` 的 CSS 变量必须同时挂到 `:root` 和 `page`。
+8. `global.scss` 必须 reset 小程序端 `button / input / textarea` 默认样式。
+9. `AppButton` 支持 `primary / secondary / ghost / danger`。
+10. `AppCard` 支持 `default / emphasis / warning / danger`。
+11. `AppInput` 支持错误提示。
+12. `AppAmountInput` 支持金额输入和两位小数。
+13. 不实现业务页面。
+14. 不引入 Wot Design Uni 之外的通用 UI 库。
+15. 不新增未定义颜色。
 
 完成后输出：
 
