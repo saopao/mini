@@ -1,9 +1,5 @@
 @use "./tokens.scss";
 
-* {
-  box-sizing: border-box;
-}
-
 view,
 text,
 button,
@@ -12,8 +8,7 @@ textarea {
   box-sizing: border-box;
 }
 
-page,
-body {
+page {
   min-height: 100%;
   background: var(--color-bg-page);
   color: var(--color-text-primary);
