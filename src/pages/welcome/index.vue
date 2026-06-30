@@ -1,6 +1,5 @@
 <template>
   <AppPage>
-    <AppHeader title="开店避坑助手" />
     <view class="welcome">
       <view class="welcome__hero">
         <text class="welcome__title">开店避坑助手</text>
@@ -32,7 +31,6 @@
 import { onShow } from '@dcloudio/uni-app'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import HeroShopVisual from '../../components/business/HeroShopVisual.vue'
 import { trackEvent } from '../../services/analytics/events'

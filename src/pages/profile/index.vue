@@ -1,6 +1,5 @@
 <template>
   <AppPage tab>
-    <AppHeader title="我的" />
     <view class="profile">
       <AppCard v-if="model" class="profile__model">
         <view class="profile__model-row">
@@ -56,7 +55,6 @@ import { onShow } from '@dcloudio/uni-app'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import { getIndustryModel } from '../../constants/industryModels'
 import { trackEvent } from '../../services/analytics/events'

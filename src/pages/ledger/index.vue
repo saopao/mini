@@ -1,6 +1,5 @@
 <template>
   <AppPage tab>
-    <AppHeader title="快速记账" />
     <view v-if="model" class="ledger">
       <AppSegmented v-model="form.type" :options="typeOptions" />
 
@@ -68,7 +67,6 @@ import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppChip from '../../components/base/AppChip.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import AppSegmented from '../../components/base/AppSegmented.vue'
 import AppToast from '../../components/base/AppToast.vue'

@@ -1,6 +1,5 @@
 <template>
   <AppPage tab>
-    <AppHeader title="今日看板" />
     <view v-if="model && dashboard" class="dashboard">
       <AppCard
         class="dashboard__hero"
@@ -71,7 +70,6 @@ import { onShow } from '@dcloudio/uni-app'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'
 import ProgressCard from '../../components/business/ProgressCard.vue'

@@ -1,6 +1,5 @@
 <template>
   <AppPage>
-    <AppHeader title="选择行业" back />
     <view class="industry">
       <view class="industry__intro">
         <text class="industry__hint">不同行业，风险与盈利能力不同</text>
@@ -32,7 +31,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import AppButton from '../../components/base/AppButton.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import IndustryCard from '../../components/business/IndustryCard.vue'
 import { industryModels } from '../../constants/industryModels'

@@ -1,6 +1,5 @@
 <template>
   <AppPage>
-    <AppHeader title="开始测算" back fallback="/pages/industry/index" />
     <view class="calculate">
       <view class="calculate__progress">
         <view class="calculate__progress-bar" />
@@ -40,7 +39,6 @@ import { onBackPress, onShow } from '@dcloudio/uni-app'
 import AppAmountInput from '../../components/base/AppAmountInput.vue'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppInput from '../../components/base/AppInput.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'

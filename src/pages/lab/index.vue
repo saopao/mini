@@ -1,6 +1,5 @@
 <template>
   <AppPage tab>
-    <AppHeader title="实验室" />
     <view v-if="model && result" class="lab">
       <AppSegmented v-model="mode" :options="modeOptions" />
 
@@ -46,7 +45,6 @@ import AppAmountInput from '../../components/base/AppAmountInput.vue'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppInput from '../../components/base/AppInput.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import AppSegmented from '../../components/base/AppSegmented.vue'

@@ -3,49 +3,49 @@
     {
       "path": "pages/welcome/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "开店避坑助手"
       }
     },
     {
       "path": "pages/industry/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "选择行业"
       }
     },
     {
       "path": "pages/calculate/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "开始测算"
       }
     },
     {
       "path": "pages/report/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "经营报告"
       }
     },
     {
       "path": "pages/dashboard/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "今日看板"
       }
     },
     {
       "path": "pages/ledger/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "快速记账"
       }
     },
     {
       "path": "pages/lab/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "实验室"
       }
     },
     {
       "path": "pages/profile/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "我的"
       }
     }
   ],

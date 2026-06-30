@@ -1,6 +1,5 @@
 <template>
   <AppPage>
-    <AppHeader title="经营报告" back fallback="/pages/calculate/index" />
     <view v-if="model && report" class="report">
       <ReportConclusion
         label="日流水目标（达回本线）"
@@ -70,7 +69,6 @@ import { onShow } from '@dcloudio/uni-app'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
-import AppHeader from '../../components/base/AppHeader.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'
 import ReportConclusion from '../../components/business/ReportConclusion.vue'
