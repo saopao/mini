@@ -35,7 +35,7 @@
 - `docs/03-design-system.md`
 - `docs/09-visual-review.md`
 - `docs/12-cross-platform-ui-consistency.md`
-- `reference/design-reference.png`
+- `reference/design-reference-v1.png`
 
 工程与测试：
 
@@ -48,7 +48,7 @@
 
 - `reference/source-prototype-prd.md`
 - `reference/source-deep-analysis.md`
-- `reference/design-reference.png`
+- `reference/design-reference-v1.png`
 
 ## 当前硬约束
 

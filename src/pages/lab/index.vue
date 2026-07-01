@@ -13,25 +13,62 @@
         <MetricGrid :items="baselineItems" />
       </AppCard>
 
-      <AppCard>
-        <text class="lab__section-title">参数调整</text>
-        <view class="lab__controls">
-          <AppInput v-model="patch.avgOrderValue" mode="row" icon="客" label="客单价" input-type="digit" unit="元" :error="fieldErrors.avgOrderValue" />
-          <AppInput v-model="patch.dailyOrderTarget" mode="row" icon="单" label="日单量" input-type="number" unit="单" :error="fieldErrors.dailyOrderTarget" />
-          <AppInput v-model="patch.grossMarginRate" mode="row" icon="利" label="毛利率" input-type="digit" unit="%" :error="fieldErrors.grossMarginRate" />
-          <AppAmountInput v-model="patch.monthlyFixedCost" mode="row" icon="支" label="固定支出（元/月）" :error="fieldErrors.monthlyFixedCost" />
-          <AppInput v-model="patch.paybackMonths" mode="row" icon="回" label="回本周期" input-type="number" unit="个月" :error="fieldErrors.paybackMonths" />
+      <view v-if="mode === 'simulate'" class="lab__mode">
+        <AppCard class="lab__guide">
+          <text>先选一个变量试一试</text>
+          <text>实验室只做推演，不会自动覆盖当前模型。</text>
+          <view class="lab__quick">
+            <AppChip @click="quickAdjust('avgOrderValue')">客单价 +10%</AppChip>
+            <AppChip @click="quickAdjust('grossMarginRate')">毛利率 +3%</AppChip>
+            <AppChip @click="quickAdjust('monthlyFixedCost')">固定支出 -10%</AppChip>
+            <AppChip @click="quickAdjust('paybackMonths')">回本 +3 月</AppChip>
+          </view>
+        </AppCard>
+
+        <AppCard>
+          <text class="lab__section-title">参数调整</text>
+          <view class="lab__controls">
+            <AppInput v-model="patch.avgOrderValue" mode="row" icon="客" label="客单价" input-type="digit" unit="元" :error="fieldErrors.avgOrderValue" />
+            <AppInput v-model="patch.dailyOrderTarget" mode="row" icon="单" label="日单量" input-type="number" unit="单" :error="fieldErrors.dailyOrderTarget" />
+            <AppInput v-model="patch.grossMarginRate" mode="row" icon="利" label="毛利率" input-type="digit" unit="%" :error="fieldErrors.grossMarginRate" />
+            <AppAmountInput v-model="patch.monthlyFixedCost" mode="row" icon="支" label="固定支出（元/月）" :error="fieldErrors.monthlyFixedCost" />
+            <AppInput v-model="patch.paybackMonths" mode="row" icon="回" label="回本周期" input-type="number" unit="个月" :error="fieldErrors.paybackMonths" />
+          </view>
+        </AppCard>
+
+        <ScenarioCompare :items="compareItems" />
+
+        <AppToast :message="labMessage" type="warning" />
+
+        <view class="lab__actions">
+          <AppButton block @click="adoptScenario">采纳此方案</AppButton>
+          <AppButton block variant="secondary" @click="resetPatch">恢复当前模型</AppButton>
+          <AppButton block variant="ghost" @click="goReport">查看报告</AppButton>
         </view>
-      </AppCard>
+      </view>
 
-      <ScenarioCompare :items="compareItems" />
+      <view v-else class="lab__mode">
+        <AppCard class="lab__guide">
+          <text>先看几种常见情景</text>
+          <text>对比结果用于理解压力变化，套用后仍需手动采纳。</text>
+        </AppCard>
 
-      <AppToast :message="labMessage" type="warning" />
-
-      <view class="lab__actions">
-        <AppButton block @click="adoptScenario">采纳此方案</AppButton>
-        <AppButton block variant="secondary" @click="resetPatch">恢复当前模型</AppButton>
-        <AppButton block variant="ghost" @click="goReport">查看报告</AppButton>
+        <AppCard v-for="preset in scenarioPresets" :key="preset.code" class="lab__scenario">
+          <view class="lab__scenario-head">
+            <view>
+              <text>{{ preset.label }}</text>
+              <text>{{ preset.desc }}</text>
+            </view>
+            <button v-if="preset.code !== 'current'" @click="applyPreset(preset.code)">套用</button>
+          </view>
+          <view class="lab__scenario-grid">
+            <view v-for="item in scenarioRows(preset)" :key="item.label">
+              <text>{{ item.label }}</text>
+              <text>{{ item.value }}</text>
+              <text :class="{ 'lab__delta--up': item.positive, 'lab__delta--down': !item.positive }">{{ item.delta }}</text>
+            </view>
+          </view>
+        </AppCard>
       </view>
     </view>
 
@@ -47,6 +84,7 @@ import { onShow } from '@dcloudio/uni-app'
 import AppAmountInput from '../../components/base/AppAmountInput.vue'
 import AppButton from '../../components/base/AppButton.vue'
 import AppCard from '../../components/base/AppCard.vue'
+import AppChip from '../../components/base/AppChip.vue'
 import AppEmpty from '../../components/base/AppEmpty.vue'
 import AppInput from '../../components/base/AppInput.vue'
 import AppPage from '../../components/base/AppPage.vue'
@@ -56,7 +94,7 @@ import MetricGrid from '../../components/business/MetricGrid.vue'
 import ScenarioCompare from '../../components/business/ScenarioCompare.vue'
 import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import { trackEvent } from '../../services/analytics/events'
-import type { SimulationPatch } from '../../services/calculator/types'
+import type { ScenarioPreset, ScenarioPresetCode, SimulationPatch } from '../../services/calculator/types'
 import { validateSimulationPatch } from '../../services/calculator/simulate'
 import { useLedgerStore } from '../../stores/ledger'
 import { useReportStore } from '../../stores/report'
@@ -104,6 +142,7 @@ const result = computed(() => {
   if (!model.value) return null
   return reportStore.runScenario(model.value, validationErrors.value.length ? {} : scenarioPatch.value)
 })
+const scenarioPresets = computed(() => (model.value ? reportStore.getScenarioPresets(model.value) : []))
 const labMessage = computed(() => validationErrors.value[0]?.message ?? result.value?.advice ?? '')
 const baselineItems = computed(() => {
   if (!result.value || !model.value) return []
@@ -178,6 +217,62 @@ function resetPatch() {
   patch.grossMarginRate = String(Math.round(shopStore.currentModel.grossMarginRate * 100))
   patch.monthlyFixedCost = String(shopStore.currentModel.monthlyFixedCost)
   patch.paybackMonths = String(shopStore.currentModel.paybackMonths)
+}
+
+function quickAdjust(field: keyof SimulationPatch) {
+  if (!model.value) return
+  resetPatch()
+  if (field === 'avgOrderValue') patch.avgOrderValue = String(Math.round(model.value.avgOrderValue * 1.1))
+  if (field === 'grossMarginRate') patch.grossMarginRate = String(Math.min(95, Math.round(model.value.grossMarginRate * 100 + 3)))
+  if (field === 'monthlyFixedCost') patch.monthlyFixedCost = String(Math.round(model.value.monthlyFixedCost * 0.9))
+  if (field === 'paybackMonths') patch.paybackMonths = String(Math.min(60, model.value.paybackMonths + 3))
+}
+
+function applyPreset(code: ScenarioPresetCode) {
+  const preset = scenarioPresets.value.find((item) => item.code === code)
+  if (!preset) return
+  patch.avgOrderValue = String(Math.round(preset.result.patchedModel.avgOrderValue))
+  patch.dailyOrderTarget = ''
+  patch.grossMarginRate = String(Math.round(preset.result.patchedModel.grossMarginRate * 100))
+  patch.monthlyFixedCost = String(Math.round(preset.result.patchedModel.monthlyFixedCost))
+  patch.paybackMonths = String(preset.result.patchedModel.paybackMonths)
+  mode.value = 'simulate'
+}
+
+function scenarioRows(preset: ScenarioPreset) {
+  const before = preset.result.before
+  const after = preset.result.after
+  const revenueDelta = formatDelta(percentChange(before.dailyRevenueTarget, after.dailyRevenueTarget), false)
+  const orderDelta = formatDelta(percentChange(before.dailyOrderTarget, after.dailyOrderTarget), false)
+  const profitDelta = formatDelta(percentChange(before.monthlyProfitTarget, after.monthlyProfitTarget), true)
+  const paybackDelta = model.value ? model.value.paybackMonths - preset.result.patchedModel.paybackMonths : 0
+
+  return [
+    {
+      label: '日流水',
+      value: formatMoney(after.dailyRevenueTarget),
+      delta: revenueDelta.text,
+      positive: revenueDelta.positive
+    },
+    {
+      label: '日单量',
+      value: formatOrders(after.dailyOrderTarget),
+      delta: orderDelta.text,
+      positive: orderDelta.positive
+    },
+    {
+      label: '月利润',
+      value: formatMoney(after.monthlyProfitTarget),
+      delta: profitDelta.text,
+      positive: profitDelta.positive
+    },
+    {
+      label: '回本',
+      value: `${preset.result.patchedModel.paybackMonths} 月`,
+      delta: paybackDelta === 0 ? '持平' : paybackDelta > 0 ? `缩短 ${paybackDelta} 月` : `延长 ${Math.abs(paybackDelta)} 月`,
+      positive: paybackDelta >= 0
+    }
+  ]
 }
 
 function adoptScenario() {
@@ -256,6 +351,31 @@ function recoverStorageIssue() {
   font-weight: 700;
 }
 
+.lab__mode,
+.lab__guide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lab__guide > text:first-child {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.lab__guide > text:nth-child(2) {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lab__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .lab__controls {
   display: flex;
   flex-direction: column;
@@ -280,6 +400,90 @@ function recoverStorageIssue() {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
+}
+
+.lab__scenario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lab__scenario-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lab__scenario-head view {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.lab__scenario-head text:first-child {
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.lab__scenario-head text:last-child {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lab__scenario-head button {
+  flex: 0 0 auto;
+  min-width: 52px;
+  min-height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--color-success-bg);
+  color: var(--color-brand-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lab__scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lab__scenario-grid view {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+  padding: 9px;
+}
+
+.lab__scenario-grid text:first-child {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.lab__scenario-grid text:nth-child(2) {
+  overflow-wrap: anywhere;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lab__scenario-grid text:last-child {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.lab__delta--up {
+  color: var(--color-brand-dark);
+}
+
+.lab__delta--down {
+  color: var(--color-warning);
 }
 
 @media (min-width: 360px) {

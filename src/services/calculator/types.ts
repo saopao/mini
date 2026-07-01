@@ -39,6 +39,8 @@ export interface ShopModel {
 
 export type LedgerType = 'income' | 'expense'
 
+export type DashboardPeriod = 'day' | 'week' | 'month'
+
 export interface LedgerRecord {
   id: string
   shopId: string
@@ -77,6 +79,7 @@ export interface OperatingReport extends CalculationResult {
 
 export interface DashboardSnapshot {
   date: string
+  period: DashboardPeriod
   dailyRevenueTarget: number
   todayIncome: number
   todayExpense: number
@@ -86,7 +89,43 @@ export interface DashboardSnapshot {
   accumulatedEstimatedProfit: number
   paybackProgress: number
   trend7d: Array<{ date: string; income: number; profit: number }>
+  periodSummary: DashboardPeriodSummary
+  periodTrend: DashboardTrendPoint[]
+  paybackStatus: PaybackStatus
   recentRecords: LedgerRecord[]
+}
+
+export interface DashboardPeriodSummary {
+  period: DashboardPeriod
+  label: string
+  startDate: string
+  endDate: string
+  targetRevenue: number
+  income: number
+  expense: number
+  estimatedProfit: number
+  completionRate: number
+  targetGap: number
+  recordCount: number
+  activeDays: number
+}
+
+export interface DashboardTrendPoint {
+  date: string
+  label: string
+  startDate: string
+  endDate: string
+  income: number
+  profit: number
+}
+
+export interface PaybackStatus {
+  initialInvestment: number
+  accumulatedEstimatedProfit: number
+  paybackProgress: number
+  remainingInvestment: number
+  isNegative: boolean
+  isComplete: boolean
 }
 
 export interface SimulationPatch {
@@ -102,6 +141,15 @@ export interface SimulationResult {
   after: CalculationResult
   patchedModel: ShopModel
   advice: string
+}
+
+export type ScenarioPresetCode = 'current' | 'reduce-pressure' | 'improve-efficiency' | 'stress-test'
+
+export interface ScenarioPreset {
+  code: ScenarioPresetCode
+  label: string
+  desc: string
+  result: SimulationResult
 }
 
 export interface SimulationValidationError {

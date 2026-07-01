@@ -32,7 +32,7 @@
 
 视觉：
 
-- 参考 `reference/design-reference.png` 第一屏气质。
+- 参考 `reference/design-reference-v1.png` 第一屏气质。
 - 背景可使用浅绿氛围。
 - 主按钮深绿实心。
 - 不要堆复杂说明。

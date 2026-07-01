@@ -6,7 +6,7 @@
 - `docs/03-design-system.md`
 - `docs/09-visual-review.md`
 - `docs/12-cross-platform-ui-consistency.md`
-- `reference/design-reference.png`
+- `reference/design-reference-v1.png`
 
 任务：
 
@@ -14,7 +14,7 @@
 
 请我提供：
 
-- 设计参考图：`reference/design-reference.png` 或 `screenshots/design/页面名.png`
+- 设计参考图：`reference/design-reference-v1.png` 或 `screenshots/design/页面名.png`
 - 当前实现截图：`screenshots/actual/页面名-v1.png`
 
 分析维度：

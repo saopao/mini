@@ -1,5 +1,6 @@
-import type { ShopModel, SimulationPatch, SimulationResult, SimulationValidationError } from './types'
+import type { ScenarioPreset, ShopModel, SimulationPatch, SimulationResult, SimulationValidationError } from './types'
 import { calculateTargets } from './formulas'
+import { round } from '../../utils/number'
 
 export function simulateScenario(model: ShopModel, patch: SimulationPatch): SimulationResult {
   const before = calculateTargets(model)
@@ -32,6 +33,45 @@ export function validateSimulationPatch(patch: SimulationPatch): SimulationValid
     errors.push({ field: 'paybackMonths', message: '回本周期应在 1-60 个月之间' })
   }
   return errors
+}
+
+export function buildScenarioPresets(model: ShopModel): ScenarioPreset[] {
+  return [
+    {
+      code: 'current',
+      label: '当前方案',
+      desc: '不调整参数，用作对比基线。',
+      result: simulateScenario(model, {})
+    },
+    {
+      code: 'reduce-pressure',
+      label: '降压方案',
+      desc: '固定支出下降 10%，回本周期延长 3 个月。',
+      result: simulateScenario(model, {
+        monthlyFixedCost: round(model.monthlyFixedCost * 0.9),
+        paybackMonths: Math.min(60, model.paybackMonths + 3)
+      })
+    },
+    {
+      code: 'improve-efficiency',
+      label: '提效方案',
+      desc: '客单价提高 10%，毛利率提高 3 个百分点。',
+      result: simulateScenario(model, {
+        avgOrderValue: round(model.avgOrderValue * 1.1),
+        grossMarginRate: Math.min(0.95, round(model.grossMarginRate + 0.03, 4))
+      })
+    },
+    {
+      code: 'stress-test',
+      label: '压力测试',
+      desc: '客单价下降 10%，毛利率下降 3 个百分点，固定支出上升 10%。',
+      result: simulateScenario(model, {
+        avgOrderValue: round(model.avgOrderValue * 0.9),
+        grossMarginRate: Math.max(0.01, round(model.grossMarginRate - 0.03, 4)),
+        monthlyFixedCost: round(model.monthlyFixedCost * 1.1)
+      })
+    }
+  ]
 }
 
 function applyPatch(model: ShopModel, patch: SimulationPatch): ShopModel {

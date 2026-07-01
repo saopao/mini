@@ -2,8 +2,8 @@ import { defineStore } from 'pinia'
 import { computed } from 'vue'
 import { getIndustryModel } from '../constants/industryModels'
 import { buildDashboardSnapshot, buildOperatingReport } from '../services/calculator/reportBuilder'
-import { simulateScenario } from '../services/calculator/simulate'
-import type { ShopModel, SimulationPatch } from '../services/calculator/types'
+import { buildScenarioPresets, simulateScenario } from '../services/calculator/simulate'
+import type { DashboardPeriod, ShopModel, SimulationPatch } from '../services/calculator/types'
 import { todayString } from '../utils/date'
 import { useLedgerStore } from './ledger'
 import { useShopStore } from './shop'
@@ -30,13 +30,17 @@ export const useReportStore = defineStore('report', () => {
     return buildOperatingReport(model, getIndustryModel(model.industryId))
   }
 
-  function buildDashboardFor(date: string) {
+  function buildDashboardFor(date: string, period: DashboardPeriod = 'day') {
     if (!shopStore.currentModel) return null
-    return buildDashboardSnapshot(shopStore.currentModel, ledgerStore.records, date)
+    return buildDashboardSnapshot(shopStore.currentModel, ledgerStore.records, date, period)
   }
 
   function runScenario(model: ShopModel, patch: SimulationPatch) {
     return simulateScenario(model, patch)
+  }
+
+  function getScenarioPresets(model: ShopModel) {
+    return buildScenarioPresets(model)
   }
 
   return {
@@ -45,6 +49,7 @@ export const useReportStore = defineStore('report', () => {
     dashboard,
     buildReportFor,
     buildDashboardFor,
-    runScenario
+    runScenario,
+    getScenarioPresets
   }
 })

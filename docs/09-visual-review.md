@@ -2,7 +2,7 @@
 
 ## 目的
 
-视觉质量不能只靠一次生成。每个页面都必须经过截图、对比、修复和复验，防止页面逐步偏离 `reference/design-reference.png`、`docs/03-design-system.md` 和 Wot Design Uni 的跨端组件基线。
+视觉质量不能只靠一次生成。每个页面都必须经过截图、对比、修复和复验。二版迭代不按旧设计图做像素或结构还原，验收重点是实际实现效果、`docs/03-design-system.md`、Wot Design Uni 组件基线和跨端一致性；`reference/design-reference-v1.png` 只保留为旧版视觉语气参考。
 
 跨端视觉一致性以 `docs/12-cross-platform-ui-consistency.md` 为补充标准。H5 和微信小程序端的卡片、按钮、输入框、页面背景和安全区必须分别验收。
 
@@ -44,13 +44,13 @@ screenshots/
     report-v2.png
 ```
 
-当前只有总视觉稿时，使用：
+旧版总视觉稿仅用于参考视觉语气时，使用：
 
 ```text
-reference/design-reference.png
+reference/design-reference-v1.png
 ```
 
-正式项目以 `reference/design-reference.png` 为视觉参考源。
+二版新增或重构页面不要求与 `reference/design-reference-v1.png` 结构一致，以实际实现体验为准。
 
 ## 评分维度
 

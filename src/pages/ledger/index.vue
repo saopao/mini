@@ -5,6 +5,14 @@
     <view v-else-if="model" class="ledger">
       <AppSegmented v-model="form.type" :options="typeOptions" />
 
+      <AppCard v-if="editing" class="ledger__edit-banner">
+        <view>
+          <text>正在编辑历史记录</text>
+          <text>保存后会更新原记录，不会新增一笔。</text>
+        </view>
+        <button @click="resetForm">取消</button>
+      </AppCard>
+
       <AppCard>
         <view class="ledger__date-row">
           <text>{{ form.date }}</text>
@@ -40,35 +48,29 @@
         </view>
       </AppCard>
 
-      <AppCard>
+      <view class="ledger__primary-action">
+        <AppButton block @click="saveRecord">{{ editing ? '保存修改' : '保存记录' }}</AppButton>
+      </view>
+
+      <button class="ledger__remark-toggle" @click="showRemark = !showRemark">{{ showRemark ? '收起备注' : '添加备注（选填）' }}</button>
+
+      <AppCard v-if="showRemark">
         <text class="ledger__label">备注（选填）</text>
         <textarea class="ledger__remark" :value="form.remark" maxlength="50" placeholder="可输入用途、渠道等" @input="handleRemarkInput" />
         <text class="ledger__counter">{{ form.remark.length }}/50</text>
       </AppCard>
 
-      <AppCard v-if="historyRecords.length">
-        <view class="ledger__history-head">
-          <text class="ledger__label">历史记录</text>
-          <text>点击可编辑或删除</text>
-        </view>
-        <view class="ledger__history-list">
-          <button v-for="record in historyRecords" :key="record.id" class="ledger__history-item" @click="editRecord(record.id)">
-            <view>
-              <text>{{ record.type === 'income' ? '收入' : '支出' }} · {{ record.category }}</text>
-              <text>{{ record.date }}</text>
-            </view>
-            <text>{{ formatMoney(record.amount) }}</text>
-          </button>
+      <AppCard>
+        <view class="ledger__records-entry">
+          <view>
+            <text class="ledger__label">历史记录</text>
+            <text>{{ ledgerStore.records.length ? `共 ${ledgerStore.records.length} 条，可筛选和编辑` : '还没有记录' }}</text>
+          </view>
+          <AppButton variant="secondary" @click="goRecords">查看</AppButton>
         </view>
       </AppCard>
 
       <AppToast :message="feedback" />
-
-      <view class="ledger__actions">
-        <AppButton block @click="saveRecord">{{ editing ? '保存修改' : '保存记录' }}</AppButton>
-        <AppButton v-if="editing" block variant="danger" @click="deleteRecord">删除记录</AppButton>
-        <AppButton v-if="editing" block variant="secondary" @click="resetForm">继续记一笔</AppButton>
-      </view>
     </view>
 
     <AppEmpty v-else title="先完成测算" desc="保存经营模型后，记账才会自动更新今日目标。">
@@ -104,6 +106,7 @@ const ledgerStore = useLedgerStore()
 const reportStore = useReportStore()
 const feedback = ref('')
 const error = ref('')
+const showRemark = ref(false)
 
 const form = reactive({
   date: todayString(),
@@ -128,12 +131,6 @@ const storageIssueDesc = computed(() =>
 const editing = computed(() => ledgerStore.editingRecord)
 const categories = computed(() => (form.type === 'income' ? incomeCategories : expenseCategories))
 const todaySnapshot = computed(() => reportStore.buildDashboardFor(form.date))
-const historyRecords = computed(() =>
-  ledgerStore.records
-    .slice()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 8)
-)
 
 watch(
   () => form.type,
@@ -152,6 +149,7 @@ onShow(() => {
     form.amount = String(record.amount)
     form.category = record.category
     form.remark = record.remark ?? ''
+    showRemark.value = Boolean(record.remark)
   }
 })
 
@@ -173,9 +171,10 @@ function saveRecord() {
   }
   error.value = ''
   const wasEmpty = ledgerStore.records.length === 0
-  if (editing.value) {
+  const editingRecord = editing.value
+  if (editingRecord) {
     ledgerStore.updateRecord({
-      ...editing.value,
+      ...editingRecord,
       date: form.date,
       type: form.type,
       amount,
@@ -196,34 +195,24 @@ function saveRecord() {
     trackEvent('ledger_entry_create', { type: form.type })
   }
   const snapshot = reportStore.buildDashboardFor(form.date)
-  if (form.type === 'income') {
+  if (editingRecord) {
+    feedback.value = '记录已更新，看板数据已同步刷新。'
+    resetForm()
+  } else if (form.type === 'income') {
     const gap = snapshot?.targetGap ?? 0
     feedback.value = gap > 0 ? `已记录收入 ${formatMoney(amount)}，今天还差 ${formatMoney(gap)} 达到回本线。` : `已记录收入 ${formatMoney(amount)}，今天已超过回本线。`
+    resetFieldsOnly()
   } else {
     feedback.value = `已记录支出 ${formatMoney(amount)}，今日估算利润为 ${formatMoney(snapshot?.todayEstimatedProfit ?? 0)}。`
+    resetFieldsOnly()
   }
-  resetFieldsOnly()
-}
-
-function deleteRecord() {
-  if (!editing.value) return
-  uni.showModal({
-    title: '删除这条记录？',
-    content: '删除后看板、趋势和回本进度会同步回滚。',
-    success(result) {
-      if (!result.confirm || !editing.value) return
-      ledgerStore.removeRecord(editing.value.id)
-      ledgerStore.setEditingRecord(null)
-      feedback.value = '记录已删除，看板数据已同步刷新。'
-      resetFieldsOnly()
-    }
-  })
 }
 
 function resetFieldsOnly() {
   form.amount = ''
   form.remark = ''
   form.category = categories.value[0]
+  showRemark.value = false
 }
 
 function resetForm() {
@@ -233,19 +222,12 @@ function resetForm() {
   resetFieldsOnly()
 }
 
-function editRecord(id: string) {
-  ledgerStore.setEditingRecord(id)
-  const record = ledgerStore.editingRecord
-  if (!record) return
-  form.date = record.date
-  form.type = record.type
-  form.amount = String(record.amount)
-  form.category = record.category
-  form.remark = record.remark ?? ''
-}
-
 function goCalculate() {
   uni.navigateTo({ url: '/pages/industry/index' })
+}
+
+function goRecords() {
+  uni.navigateTo({ url: '/pages/ledger-records/index' })
 }
 
 function retryStorage() {
@@ -295,6 +277,41 @@ function recoverStorageIssue() {
   font-weight: 700;
 }
 
+.ledger__edit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: #fff7e6;
+  background: var(--color-warning-bg);
+}
+
+.ledger__edit-banner view {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ledger__edit-banner text:first-child {
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ledger__edit-banner text:last-child {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.ledger__edit-banner button {
+  flex: 0 0 auto;
+  color: var(--color-brand-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .ledger__date-action {
   color: var(--color-brand-dark);
   font-size: 12px;
@@ -321,6 +338,18 @@ function recoverStorageIssue() {
   font-weight: 700;
 }
 
+.ledger__primary-action {
+  margin-top: -2px;
+}
+
+.ledger__remark-toggle {
+  align-self: flex-start;
+  min-height: 34px;
+  color: var(--color-brand-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .ledger__remark {
   width: 100%;
   min-height: 74px;
@@ -340,55 +369,26 @@ function recoverStorageIssue() {
   text-align: right;
 }
 
-.ledger__history-head {
+.ledger__records-entry {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 12px;
 }
 
-.ledger__history-head text:last-child {
+.ledger__records-entry view {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.ledger__records-entry view text:last-child {
   color: var(--color-text-muted);
   font-size: 12px;
 }
 
-.ledger__history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ledger__history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 46px;
-  border-radius: var(--radius-md);
-  background: var(--color-bg-page);
-  padding: 0 12px;
-  color: var(--color-text-primary);
-  font-size: 13px;
-  text-align: left;
-}
-
-.ledger__history-item view {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.ledger__history-item view text:last-child {
-  color: var(--color-text-muted);
-  font-size: 11px;
-}
-
-.ledger__history-item > text {
-  font-weight: 700;
-}
-
-.ledger__actions {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
+.ledger__records-entry :deep(.wd-button) {
+  min-width: 76px;
 }
 </style>

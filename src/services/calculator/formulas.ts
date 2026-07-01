@@ -1,5 +1,5 @@
-import type { CalculationResult, LedgerRecord, ShopModel } from './types'
-import { lastNDays } from '../../utils/date'
+import type { CalculationResult, DashboardPeriod, LedgerRecord, ShopModel } from './types'
+import { daysInMonth, endOfMonth, endOfWeek, isDateInRange, lastNDays, lastNMonths, lastNWeeks, startOfMonth, startOfWeek } from '../../utils/date'
 import { round } from '../../utils/number'
 
 export interface ValidationError {
@@ -76,6 +76,59 @@ export function sumRecords(records: LedgerRecord[], date: string): { income: num
     )
 }
 
+export function sumRecordsInRange(records: LedgerRecord[], startDate: string, endDate: string): { income: number; expense: number; recordCount: number; activeDays: number } {
+  const activeDates = new Set<string>()
+  const sum = records
+    .filter((record) => isDateInRange(record.date, startDate, endDate))
+    .reduce(
+      (current, record) => {
+        activeDates.add(record.date)
+        current.recordCount += 1
+        if (record.type === 'income') current.income += record.amount
+        if (record.type === 'expense') current.expense += record.amount
+        return current
+      },
+      { income: 0, expense: 0, recordCount: 0 }
+    )
+
+  return {
+    ...sum,
+    activeDays: activeDates.size
+  }
+}
+
+export function getPeriodRange(date: string, period: DashboardPeriod): { startDate: string; endDate: string } {
+  if (period === 'week') {
+    return {
+      startDate: startOfWeek(date),
+      endDate: endOfWeek(date)
+    }
+  }
+  if (period === 'month') {
+    return {
+      startDate: startOfMonth(date),
+      endDate: endOfMonth(date)
+    }
+  }
+  return {
+    startDate: date,
+    endDate: date
+  }
+}
+
+export function calculatePeriodRevenueTarget(model: ShopModel, period: DashboardPeriod, date: string): number {
+  const targets = calculateTargets(model)
+  if (period === 'week') return round((targets.monthlyRevenueTarget * 7) / daysInMonth(date))
+  if (period === 'month') return targets.monthlyRevenueTarget
+  return targets.dailyRevenueTarget
+}
+
+export function calculatePeriodProfit(model: ShopModel, income: number, expense: number, activeDays: number, period: DashboardPeriod): number {
+  if (period === 'day') return calculateTodayProfit(model, income, expense)
+  const { dailyFixedCost } = calculateTargets(model)
+  return round(income * model.grossMarginRate - dailyFixedCost * activeDays - expense)
+}
+
 export function buildTrend(model: ShopModel, records: LedgerRecord[], endDate: string) {
   return lastNDays(endDate, 7).map((date) => {
     const { income, expense } = sumRecords(records, date)
@@ -85,6 +138,33 @@ export function buildTrend(model: ShopModel, records: LedgerRecord[], endDate: s
       profit: calculateTodayProfit(model, income, expense)
     }
   })
+}
+
+export function buildPeriodTrend(model: ShopModel, records: LedgerRecord[], date: string, period: DashboardPeriod) {
+  if (period === 'week') {
+    return lastNWeeks(date, 8).map(({ startDate, endDate }) => buildRangeTrendPoint(model, records, startDate, endDate, `${startDate.slice(5).replace('-', '/')}周`, period))
+  }
+  if (period === 'month') {
+    return lastNMonths(date, 6).map(({ startDate, endDate }) => buildRangeTrendPoint(model, records, startDate, endDate, startDate.slice(0, 7).replace('-', '/'), period))
+  }
+  return buildTrend(model, records, date).map((point) => ({
+    ...point,
+    label: point.date.slice(5).replace('-', '/'),
+    startDate: point.date,
+    endDate: point.date
+  }))
+}
+
+function buildRangeTrendPoint(model: ShopModel, records: LedgerRecord[], startDate: string, endDate: string, label: string, period: DashboardPeriod) {
+  const { income, expense, activeDays } = sumRecordsInRange(records, startDate, endDate)
+  return {
+    date: endDate,
+    label,
+    startDate,
+    endDate,
+    income: round(income),
+    profit: calculatePeriodProfit(model, income, expense, activeDays, period)
+  }
 }
 
 function zeroCalculation(): CalculationResult {

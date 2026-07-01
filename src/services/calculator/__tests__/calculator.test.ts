@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { calculatePaybackProgress, calculateTargets, calculateTodayProfit } from '../formulas'
 import { buildDashboardSnapshot, buildOperatingReport } from '../reportBuilder'
-import { simulateScenario, validateSimulationPatch } from '../simulate'
+import { buildScenarioPresets, simulateScenario, validateSimulationPatch } from '../simulate'
 import type { LedgerRecord, ShopModel } from '../types'
 
 const model: ShopModel = {
@@ -73,6 +73,40 @@ describe('report and dashboard', () => {
     expect(snapshot.recentRecords.length).toBe(2)
   })
 
+  it('builds complete week and month period summaries', () => {
+    const records: LedgerRecord[] = [
+      createRecord('income', 200, '2026-06-29'),
+      createRecord('expense', 120, '2026-06-29'),
+      createRecord('income', 300, '2026-07-01')
+    ]
+    const weekSnapshot = buildDashboardSnapshot(model, records, '2026-06-29', 'week')
+    const monthSnapshot = buildDashboardSnapshot(model, records, '2026-06-29', 'month')
+
+    expect(weekSnapshot.periodSummary.startDate).toBe('2026-06-29')
+    expect(weekSnapshot.periodSummary.endDate).toBe('2026-07-05')
+    expect(weekSnapshot.periodSummary.targetRevenue).toBe(10051.28)
+    expect(weekSnapshot.periodSummary.income).toBe(500)
+    expect(weekSnapshot.periodSummary.estimatedProfit).toBe(-1179.62)
+    expect(weekSnapshot.periodTrend.length).toBe(8)
+
+    expect(monthSnapshot.periodSummary.startDate).toBe('2026-06-01')
+    expect(monthSnapshot.periodSummary.endDate).toBe('2026-06-30')
+    expect(monthSnapshot.periodSummary.targetRevenue).toBe(43076.92)
+    expect(monthSnapshot.periodSummary.income).toBe(200)
+    expect(monthSnapshot.periodTrend.length).toBe(6)
+  })
+
+  it('describes negative and complete payback states', () => {
+    const negative = buildDashboardSnapshot(model, [createRecord('expense', 1000, '2026-06-29')], '2026-06-29')
+    const complete = buildDashboardSnapshot(model, [createRecord('income', 200000, '2026-06-29')], '2026-06-29')
+
+    expect(negative.paybackStatus.isNegative).toBe(true)
+    expect(negative.paybackStatus.remainingInvestment).toBeGreaterThan(model.initialInvestment)
+    expect(complete.paybackStatus.isComplete).toBe(true)
+    expect(complete.paybackStatus.remainingInvestment).toBe(0)
+    expect(complete.paybackProgress).toBeGreaterThan(1)
+  })
+
   it('ignores ledger records from other shop models', () => {
     const records: LedgerRecord[] = [
       createRecord('income', 200, '2026-06-29'),
@@ -108,6 +142,14 @@ describe('simulation', () => {
     const result = simulateScenario(model, { avgOrderValue: 30 })
     expect(result.after.dailyOrderTarget).toBeLessThan(result.before.dailyOrderTarget)
     expect(result.advice).toContain('所需单量下降')
+  })
+
+  it('builds default scenario presets without mutating the model', () => {
+    const presets = buildScenarioPresets(model)
+    expect(presets.map((preset) => preset.code)).toEqual(['current', 'reduce-pressure', 'improve-efficiency', 'stress-test'])
+    expect(presets[1].result.after.dailyRevenueTarget).toBeLessThan(presets[0].result.after.dailyRevenueTarget)
+    expect(presets[3].result.after.dailyRevenueTarget).toBeGreaterThan(presets[0].result.after.dailyRevenueTarget)
+    expect(model.monthlyFixedCost).toBe(18000)
   })
 })
 

@@ -22,7 +22,7 @@ import { computed } from 'vue'
 import { formatMoneyCompact } from '../../utils/format'
 
 const props = defineProps<{
-  points: Array<{ date: string; value: number }>
+  points: Array<{ date: string; value: number; label?: string }>
   target: number
 }>()
 
@@ -34,7 +34,7 @@ const normalized = computed(() => {
     left: props.points.length <= 1 ? 50 : (index / (props.points.length - 1)) * 100,
     bottom: Math.max(6, Math.min(92, (point.value / max) * 86)),
     label: formatMoneyCompact(point.value),
-    shortDate: point.date.slice(5).replace('-', '/')
+    shortDate: point.label ?? point.date.slice(5).replace('-', '/')
   }))
 })
 

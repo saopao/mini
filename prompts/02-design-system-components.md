@@ -6,7 +6,7 @@
 - `docs/02-reference-board.md`
 - `docs/03-design-system.md`
 - `docs/12-cross-platform-ui-consistency.md`
-- `reference/design-reference.png`
+- `reference/design-reference-v1.png`
 
 任务：
 
