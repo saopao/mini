@@ -36,12 +36,12 @@ const wotThemeVars = {
   buttonInfoPlainNormalColor: '#06733f',
   buttonPlainBgColor: '#ffffff',
   buttonLargeHeight: '48px',
-  buttonLargeRadius: '16px',
+  buttonLargeRadius: '32rpx',
   buttonLargeFs: '14px',
-  buttonLargePadding: '0 18px',
+  buttonLargePadding: '0 36rpx',
   cardBg: '#ffffff',
-  cardPadding: '13px',
-  cardRadius: '12px',
+  cardPadding: '26rpx',
+  cardRadius: '24rpx',
   cardMargin: '0',
   cardShadowColor: '0 8px 22px rgba(21, 48, 36, 0.07)',
   cardContentColor: '#17211c',
@@ -69,12 +69,12 @@ const wotThemeVars = {
 
 .app-page {
   min-height: 100vh;
-  padding: 14px 16px 24px;
+  padding: 28rpx 32rpx 48rpx;
   background: #f7faf8;
   background: var(--color-bg-page);
 }
 
 .app-page--tab {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  padding-bottom: calc(144rpx + env(safe-area-inset-bottom));
 }
 </style>

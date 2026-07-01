@@ -63,7 +63,7 @@ function handleClick() {
   height: 48px !important;
   border-radius: 16px;
   border-radius: var(--radius-xl);
-  padding: 0 18px;
+  padding: 0 36rpx;
   color: inherit;
   font-size: 14px;
   font-weight: 700;

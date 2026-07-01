@@ -38,7 +38,7 @@ function handleUpdate(value: string | number) {
   border-radius: 20px;
   border-radius: var(--radius-xl);
   background: var(--color-success-bg);
-  padding: 3px;
+  padding: 6rpx;
 }
 
 :deep(.app-segmented .wd-segmented__item) {

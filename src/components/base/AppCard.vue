@@ -27,7 +27,7 @@ const cardClass = computed(() => `app-card app-card--${props.variant}`)
   border-radius: var(--radius-lg);
   background: #fff;
   background: var(--color-bg-card);
-  padding: 13px;
+  padding: 26rpx;
   margin: 0;
   box-shadow: 0 8px 22px rgba(21, 48, 36, 0.07);
   box-shadow: var(--shadow-card);

@@ -1,5 +1,5 @@
 <template>
-  <AppPage>
+  <AppPage tab>
     <StorageRecoveryState v-if="storageIssue" :desc="storageIssueDesc" @retry="retryStorage" @recover="recoverStorageIssue" />
 
     <view v-else-if="model" class="records">
@@ -45,6 +45,13 @@
       </AppEmpty>
 
       <AppToast :message="feedback" />
+
+      <LedgerEntryPopup
+        v-model:visible="ledgerPopupVisible"
+        :editing-record-id="editingRecordId"
+        @saved="handleLedgerSaved"
+        @cancel-edit="clearLedgerEdit"
+      />
     </view>
 
     <AppEmpty v-else title="先完成测算" desc="保存经营模型后，才能管理记账记录。">
@@ -62,6 +69,7 @@ import AppEmpty from '../../components/base/AppEmpty.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import AppSegmented from '../../components/base/AppSegmented.vue'
 import AppToast from '../../components/base/AppToast.vue'
+import LedgerEntryPopup from '../../components/business/LedgerEntryPopup.vue'
 import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import type { LedgerRecord } from '../../services/calculator/types'
 import { useLedgerStore, type LedgerRecordPeriodFilter, type LedgerRecordTypeFilter } from '../../stores/ledger'
@@ -77,6 +85,8 @@ const typeFilter = ref<LedgerRecordTypeFilter>('all')
 const periodFilter = ref<LedgerRecordPeriodFilter>('month')
 const page = ref(1)
 const feedback = ref('')
+const ledgerPopupVisible = ref(false)
+const editingRecordId = ref<string | null>(null)
 
 const typeOptions = [
   { label: '全部', value: 'all' },
@@ -131,8 +141,8 @@ function groupByDate(records: LedgerRecord[]) {
 }
 
 function editRecord(id: string) {
-  ledgerStore.setEditingRecord(id)
-  uni.switchTab({ url: '/pages/ledger/index' })
+  editingRecordId.value = id
+  ledgerPopupVisible.value = true
 }
 
 function deleteRecord(id: string) {
@@ -157,7 +167,8 @@ function resultHasEnoughRecords() {
 }
 
 function goLedger() {
-  uni.switchTab({ url: '/pages/ledger/index' })
+  editingRecordId.value = null
+  ledgerPopupVisible.value = true
 }
 
 function goCalculate() {
@@ -191,6 +202,16 @@ function recoverStorageIssue() {
       }
     }
   })
+}
+
+function handleLedgerSaved() {
+  ledgerStore.load()
+  editingRecordId.value = null
+  page.value = 1
+}
+
+function clearLedgerEdit() {
+  editingRecordId.value = null
 }
 </script>
 

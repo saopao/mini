@@ -78,8 +78,8 @@
         "text": "看板"
       },
       {
-        "pagePath": "pages/ledger/index",
-        "text": "记账"
+        "pagePath": "pages/ledger-records/index",
+        "text": "记录"
       },
       {
         "pagePath": "pages/lab/index",

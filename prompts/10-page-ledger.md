@@ -1,4 +1,4 @@
-# 10. 记账页
+# 10. 记录页与快速记账弹窗
 
 请先阅读：
 
@@ -8,24 +8,23 @@
 - `docs/07-interaction-rules.md`
 - 当前已有组件和 store
 
-任务文件：`src/pages/ledger/index.vue`、`src/pages/ledger-records/index.vue`
+任务文件：`src/components/business/LedgerEntryPopup.vue`、`src/pages/ledger-records/index.vue`、`src/pages/dashboard/index.vue`
 
 
-实现记账页。
+实现记录页和公共快速记账弹窗。
 
-页面目标：10 秒内完成收入/支出记录。
+目标：从看板或记录页打开弹窗，10 秒内完成收入/支出记录。
 
 必须包含：
 
 - 日期
 - 收入/支出切换
-- 金额输入
-- 快捷金额：50 / 100 / 200 / 500
-- 分类 chip
+- 金额大号展示
+- Wot Design Uni 数字键盘
+- 分类网格
 - 可选备注入口
-- 保存按钮
+- 数字键盘内确定按钮
 - 今日摘要
-- 历史记录入口
 
 收入分类：
 
@@ -54,10 +53,11 @@
 必须支持：
 
 - 新增记录。
-- 进入记账记录页筛选、分页、编辑记录。
+- 进入记录 Tab 筛选、分页、编辑记录。
+- 新增和编辑必须复用同一个快速记账弹窗。
 - 删除记录二次确认。
 - 保存后看板同步刷新。
-- 快速记账页不展示长历史列表。
+- 快速记账弹窗不展示长历史列表。
 
 
 通用要求：

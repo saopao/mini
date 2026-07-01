@@ -18,6 +18,7 @@
 - `src/pages/report/index.vue`
 - `src/pages/dashboard/index.vue`
 - `src/pages/ledger/index.vue`
+- `src/pages/ledger-records/index.vue`
 - `src/pages/lab/index.vue`
 - `src/pages/profile/index.vue`
 
@@ -38,7 +39,7 @@ src/utils
 
 1. 配置 `pages.json`。
 2. 首启页面为 `pages/welcome/index`。
-3. tabBar 只包含：看板、记账、实验室、我的。
+3. tabBar 只包含：看板、记录、实验室、我的。
 4. 每个页面先只放页面标题和基础占位内容。
 5. 不写业务逻辑。
 6. 不写复杂样式。

@@ -90,6 +90,14 @@
     <AppEmpty v-else title="先完成测算" desc="没有经营模型时，今日目标没有参考意义。">
       <AppButton @click="goCalculate">去测算</AppButton>
     </AppEmpty>
+
+    <LedgerEntryPopup
+      v-if="model && !storageIssue"
+      v-model:visible="ledgerPopupVisible"
+      :editing-record-id="editingRecordId"
+      @saved="handleLedgerSaved"
+      @cancel-edit="clearLedgerEdit"
+    />
   </AppPage>
 </template>
 
@@ -102,6 +110,7 @@ import AppEmpty from '../../components/base/AppEmpty.vue'
 import AppPage from '../../components/base/AppPage.vue'
 import AppSegmented from '../../components/base/AppSegmented.vue'
 import MetricGrid from '../../components/business/MetricGrid.vue'
+import LedgerEntryPopup from '../../components/business/LedgerEntryPopup.vue'
 import ProgressCard from '../../components/business/ProgressCard.vue'
 import StorageRecoveryState from '../../components/business/StorageRecoveryState.vue'
 import TrendChart from '../../components/business/TrendChart.vue'
@@ -117,6 +126,8 @@ const shopStore = useShopStore()
 const ledgerStore = useLedgerStore()
 const reportStore = useReportStore()
 const selectedPeriod = ref<DashboardPeriod>('day')
+const ledgerPopupVisible = ref(false)
+const editingRecordId = ref<string | null>(null)
 
 const periodOptions = [
   { label: '今日', value: 'day' },
@@ -203,11 +214,12 @@ function goCalculate() {
 }
 
 function goLedger() {
-  uni.switchTab({ url: '/pages/ledger/index' })
+  editingRecordId.value = null
+  ledgerPopupVisible.value = true
 }
 
 function goRecords() {
-  uni.navigateTo({ url: '/pages/ledger-records/index' })
+  uni.switchTab({ url: '/pages/ledger-records/index' })
 }
 
 function goReport() {
@@ -251,8 +263,17 @@ function recoverStorageIssue() {
 }
 
 function editRecord(id: string) {
-  ledgerStore.setEditingRecord(id)
-  uni.switchTab({ url: '/pages/ledger/index' })
+  editingRecordId.value = id
+  ledgerPopupVisible.value = true
+}
+
+function handleLedgerSaved() {
+  ledgerStore.load()
+  editingRecordId.value = null
+}
+
+function clearLedgerEdit() {
+  editingRecordId.value = null
 }
 </script>
 
