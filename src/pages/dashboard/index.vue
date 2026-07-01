@@ -14,6 +14,9 @@
           <text class="dashboard__status-title">{{ statusTitle }}</text>
           <text class="dashboard__status-desc">{{ statusDesc }}</text>
         </view>
+        <view class="dashboard__hero-action">
+          <AppButton block variant="secondary" @click="goLedger">记一笔</AppButton>
+        </view>
       </AppCard>
 
       <MetricGrid :items="metricItems" />
@@ -288,6 +291,15 @@ function editRecord(id: string) {
 .dashboard__status-desc {
   font-size: 12px;
   line-height: 1.5;
+}
+
+.dashboard__hero-action {
+  margin-top: 12px;
+}
+
+.dashboard__hero-action :deep(.wd-button) {
+  min-height: 44px !important;
+  height: 44px !important;
 }
 
 .dashboard__section {
